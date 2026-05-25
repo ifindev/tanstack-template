@@ -1,0 +1,177 @@
+# TanStack Start Full-Stack Template
+
+A production-ready full-stack template using TanStack Start, tRPC v11, better-auth, Prisma, Redis, and the Vercel AI SDK.
+
+## Stack
+
+- **Framework**: TanStack Start (Vite/Vinxi SSR)
+- **Routing**: TanStack Router (file-based)
+- **API**: tRPC v11 with React Query
+- **Auth**: better-auth (email/password + email verification)
+- **Database**: PostgreSQL via Prisma ORM
+- **Cache/Rate-limit**: Redis (ioredis) + rate-limiter-flexible
+- **AI**: Vercel AI SDK with OpenAI gpt-4o-mini
+- **Logging**: pino
+- **Error tracking**: Sentry (frontend + backend)
+- **Analytics**: Google Analytics 4
+- **Forms**: react-hook-form + Zod v4
+- **UI**: shadcn/ui primitives + Tailwind CSS v4
+- **Linting**: Biome
+- **Testing**: Vitest
+- **Dev infra**: Docker Compose (app + Postgres + Redis + Mailpit)
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 20+
+- pnpm
+- Docker & Docker Compose
+
+### 1. Install dependencies
+
+```bash
+pnpm install
+```
+
+### 2. Configure environment
+
+```bash
+cp .env.example .env
+# Edit .env and fill in your values
+```
+
+### 3. Start local services (Postgres, Redis, Mailpit)
+
+```bash
+docker compose up postgres redis mailpit -d
+```
+
+### 4. Run database migrations
+
+```bash
+pnpm db:migrate
+```
+
+### 5. Start the dev server
+
+```bash
+pnpm dev
+```
+
+The app will be available at http://localhost:3000.
+Mailpit UI (email previews) at http://localhost:8025.
+
+## Environment Variables
+
+| Variable | Description | Default |
+|---|---|---|
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://postgres:postgres@localhost:5432/tanstack_template` |
+| `REDIS_URL` | Redis connection string | `redis://localhost:6379` |
+| `BETTER_AUTH_URL` | Public URL for auth callbacks | `http://localhost:3000` |
+| `BETTER_AUTH_SECRET` | Secret for session signing (min 32 chars) | — |
+| `SMTP_HOST` | SMTP server host | `localhost` |
+| `SMTP_PORT` | SMTP server port | `1025` |
+| `EMAIL_FROM` | From address for outbound emails | `noreply@example.com` |
+| `OPENAI_API_KEY` | OpenAI API key for AI chat | — |
+| `SENTRY_DSN` | Sentry DSN for server-side error tracking (optional) | — |
+| `VITE_SENTRY_DSN` | Same DSN exposed to the browser bundle (optional) | — |
+| `VITE_GA_MEASUREMENT_ID` | GA4 Measurement ID; omit to disable analytics (optional) | — |
+
+## Docker (full stack)
+
+To run the entire stack in Docker:
+
+```bash
+docker compose up --build
+```
+
+## Project Structure
+
+```
+src/
+  modules/
+    auth/         Auth schemas, service, tRPC router
+    user/         User profile schemas, service, tRPC router
+    chat/         Conversation/message schemas, service, tRPC router
+  shared/
+    db/           Prisma client singleton
+    redis/        ioredis client
+    auth/         better-auth configuration
+    trpc/         tRPC init, context, root router
+    ai/           Vercel AI SDK / OpenAI provider
+    rate-limit/   Rate limiters (auth, chat)
+    mail/         Nodemailer transport
+    logger/       pino logger singleton
+    sentry/       Sentry server and client initialization
+  components/
+    ui/           shadcn/ui primitives (Button, Input, Card, etc.)
+    layout/       Navbar
+    chat/         Chat UI components
+  routes/
+    __root.tsx    HTML shell
+    index.tsx     Landing page
+    (auth)/       Login, register, verify-email
+    _authed.tsx   Auth guard layout
+    _authed/      Protected pages (profile, chat)
+    api/          Server-side API routes (auth, tRPC, chat stream)
+  lib/
+    utils.ts      cn() helper
+    trpc.ts       tRPC React client
+    auth-client.ts  better-auth browser client
+  test/
+    setup.ts      Vitest mocks
+  styles/
+    globals.css   Tailwind v4 CSS variables + theme
+prisma/
+  schema.prisma   Database schema
+docker/
+  Dockerfile      Multi-stage production build
+docker-compose.yml
+```
+
+## Development Commands
+
+```bash
+pnpm dev           # Start dev server
+pnpm build         # Production build
+pnpm start         # Start production server
+pnpm test          # Run Vitest
+pnpm check         # Biome lint + format check
+pnpm format        # Biome auto-format
+pnpm tsc           # TypeScript type check
+pnpm db:migrate    # Run Prisma migrations (dev)
+pnpm db:studio     # Open Prisma Studio
+pnpm db:deploy     # Deploy migrations (production)
+```
+
+## Auth Flow
+
+1. User registers at `/register` — verification email is sent via Mailpit (dev) or SMTP (prod)
+2. User clicks the link in their email → `/verify-email?token=...` verifies the token
+3. User logs in at `/login` — cookie session is set
+4. Protected routes (`/profile`, `/chat/*`) require a valid session, enforced server-side in `_authed.tsx`
+
+## AI Chat
+
+- Conversations are stored in Postgres (`Conversation` + `Message` tables)
+- Messages are streamed from `/api/chat` using the Vercel AI SDK data stream protocol
+- Rate limiting: 20 requests per minute per user (Redis-backed in production, Memory in tests)
+
+## Deployment
+
+Production deployment is designed for Coolify + Traefik on a VPS. Use `docker-compose.prod.yml`; Coolify manages environment variables, Traefik routing, and TLS from its UI. See [`docs/guides/deployment.md`](docs/guides/deployment.md).
+
+## Documentation
+
+Architectural guides live in `docs/guides/`:
+
+- [`environment-setup.md`](docs/guides/environment-setup.md) — env vars, Docker services, how variables are consumed, production notes
+- [`observability.md`](docs/guides/observability.md) — pino logging, Sentry error tracking, health endpoint
+- [`analytics.md`](docs/guides/analytics.md) — GA4 setup and conditional script injection
+- [`deployment.md`](docs/guides/deployment.md) — Coolify + Traefik deployment with `docker-compose.prod.yml`
+- [`email-setup.md`](docs/guides/email-setup.md) — local Mailpit setup, production SMTP providers (Resend, Postmark, SendGrid, SES)
+- [`auth-architecture.md`](docs/guides/auth-architecture.md) — better-auth wiring, `$.ts` wildcard routes, auth service layer
+- [`tanstack-start-routing-auth.md`](docs/guides/tanstack-start-routing-auth.md) — file-based routing, auth guard, public vs private routes
+- [`tanstack-start-server-primitives.md`](docs/guides/tanstack-start-server-primitives.md) — `createServerFn` vs `server.handlers` vs tRPC
+- [`trpc-new-endpoints.md`](docs/guides/trpc-new-endpoints.md) — adding a new tRPC module end-to-end
