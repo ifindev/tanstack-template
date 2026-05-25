@@ -1,3 +1,5 @@
+import { TRPCError } from "@trpc/server";
+import { isChatEnabled } from "@/shared/ai/config";
 import { protectedProcedure, router } from "@/shared/trpc/init";
 import {
   createConversationSchema,
@@ -18,6 +20,12 @@ export const chatRouter = router({
   createConversation: protectedProcedure
     .input(createConversationSchema)
     .mutation(async ({ ctx, input }) => {
+      if (!isChatEnabled()) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Chat is disabled because AI provider config is missing.",
+        });
+      }
       return createConversation(ctx.user.id, input.title);
     }),
 

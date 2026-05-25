@@ -8,24 +8,37 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 
+type ConversationMessage = {
+  id: string;
+  role: string;
+  content: string;
+  createdAt: string;
+};
+
 export const Route = createFileRoute("/_authed/chat/$conversationId")({
   component: ConversationPage,
 });
 
 function ConversationPage() {
   const { conversationId } = Route.useParams();
+  const { data: features, isLoading: isLoadingFeatures } =
+    trpc.config.features.useQuery();
   const { data: conversation } = trpc.chat.getConversation.useQuery({
     id: conversationId,
   });
   const bottomRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
 
-  const initialMessages = conversation?.messages.map((m) => ({
-    id: m.id,
-    role: m.role as "user" | "assistant" | "system",
-    parts: [{ type: "text" as const, text: m.content }],
-    createdAt: m.createdAt,
-  }));
+  const initialMessages = conversation?.messages.map(
+    (message: ConversationMessage) => ({
+      id: message.id,
+      role: message.role as "user" | "assistant" | "system",
+      parts: [{ type: "text" as const, text: message.content }],
+      createdAt: new Date(message.createdAt),
+    }),
+  );
+  const chatEnabled = features?.chatEnabled ?? false;
+  const [chatError, setChatError] = useState<string | null>(null);
 
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
@@ -34,26 +47,36 @@ function ConversationPage() {
     }),
     id: conversationId,
     messages: initialMessages,
+    onError: () => {
+      setChatError(
+        "Chat provider request failed. Check AI provider configuration.",
+      );
+    },
   });
 
   const isLoading = status === "streaming" || status === "submitted";
+  const composerDisabled = isLoadingFeatures || !chatEnabled || isLoading;
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to bottom when messages change
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!input.trim() || composerDisabled) return;
+    setChatError(null);
     sendMessage({ text: input });
     setInput("");
   };
 
-  const getMessageText = (msg: (typeof messages)[number]): string =>
-    msg.parts
-      .filter((p): p is { type: "text"; text: string } => p.type === "text")
-      .map((p) => p.text)
+  const getMessageText = (chatMessage: (typeof messages)[number]): string =>
+    chatMessage.parts
+      .filter(
+        (messagePart): messagePart is { type: "text"; text: string } =>
+          messagePart.type === "text",
+      )
+      .map((messagePart) => messagePart.text)
       .join("");
 
   return (
@@ -68,19 +91,19 @@ function ConversationPage() {
 
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-4">
-            {messages.map((msg) => (
+            {messages.map((chatMessage) => (
               <div
-                key={msg.id}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                key={chatMessage.id}
+                className={`flex ${chatMessage.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
                   className={`max-w-[80%] rounded-lg p-3 text-sm ${
-                    msg.role === "user"
+                    chatMessage.role === "user"
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-muted-foreground"
                   }`}
                 >
-                  {getMessageText(msg)}
+                  {getMessageText(chatMessage)}
                 </div>
               </div>
             ))}
@@ -96,22 +119,36 @@ function ConversationPage() {
         </ScrollArea>
 
         <form onSubmit={handleSubmit} className="border-t p-4">
+          {!isLoadingFeatures && !chatEnabled && (
+            <div className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+              Chat is disabled because AI provider config is missing. Set
+              AI_API_KEY and AI_MODEL to send messages.
+            </div>
+          )}
+          {chatError && (
+            <div className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+              {chatError}
+            </div>
+          )}
           <div className="flex gap-2">
             <Textarea
               value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Type a message..."
+              onChange={(event) => setInput(event.target.value)}
+              placeholder={
+                chatEnabled ? "Type a message..." : "Chat is disabled"
+              }
               className="min-h-[60px] resize-none"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
+              disabled={composerDisabled}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
                   handleSubmit(
-                    e as unknown as React.FormEvent<HTMLFormElement>,
+                    event as unknown as React.FormEvent<HTMLFormElement>,
                   );
                 }
               }}
             />
-            <Button type="submit" disabled={isLoading || !input.trim()}>
+            <Button type="submit" disabled={composerDisabled || !input.trim()}>
               Send
             </Button>
           </div>
