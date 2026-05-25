@@ -73,10 +73,28 @@ Mailpit UI (email previews) at http://localhost:8025.
 | `SMTP_HOST` | SMTP server host | `localhost` |
 | `SMTP_PORT` | SMTP server port | `1025` |
 | `EMAIL_FROM` | From address for outbound emails | `noreply@example.com` |
-| `OPENAI_API_KEY` | OpenAI API key for AI chat | — |
+| `AI_API_KEY` | AI provider API key; required only to enable chat | — |
+| `AI_BASE_URL` | OpenAI-compatible provider base URL; omit for OpenAI | — |
+| `AI_MODEL` | AI model id; required only to enable chat | — |
+| `OPENAI_API_KEY` | Legacy fallback for `AI_API_KEY` | — |
 | `SENTRY_DSN` | Sentry DSN for server-side error tracking (optional) | — |
 | `VITE_SENTRY_DSN` | Same DSN exposed to the browser bundle (optional) | — |
 | `VITE_GA_MEASUREMENT_ID` | GA4 Measurement ID; omit to disable analytics (optional) | — |
+
+OpenAI example:
+
+```env
+AI_API_KEY=sk-...
+AI_MODEL=gpt-4o-mini
+```
+
+OpenRouter example:
+
+```env
+AI_API_KEY=sk-or-...
+AI_BASE_URL=https://openrouter.ai/api/v1
+AI_MODEL=openai/gpt-4o-mini
+```
 
 ## Docker (full stack)
 

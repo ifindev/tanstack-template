@@ -56,9 +56,13 @@ Set these in Coolify:
 - `SMTP_HOST`
 - `SMTP_PORT`
 - `EMAIL_FROM`
-- `OPENAI_API_KEY`
+- `AI_API_KEY` optional; required only to enable chat
+- `AI_MODEL` optional; required only to enable chat
+- `AI_BASE_URL` optional; use `https://openrouter.ai/api/v1` for OpenRouter
+- `OPENAI_API_KEY` optional legacy fallback for `AI_API_KEY`
 - `SENTRY_DSN` optional, recommended
 - `VITE_SENTRY_DSN` optional, recommended; usually the same value as `SENTRY_DSN`
 - `VITE_GA_MEASUREMENT_ID` optional
 
 Use `BETTER_AUTH_URL` with the final HTTPS domain, for example `https://app.example.com`.
+If AI config is omitted, the app still runs and chat shows a disabled-state message.

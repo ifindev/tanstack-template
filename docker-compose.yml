@@ -57,7 +57,10 @@ services:
       SMTP_HOST: mailpit
       SMTP_PORT: 1025
       EMAIL_FROM: noreply@example.com
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_BASE_URL: ${AI_BASE_URL:-}
+      AI_MODEL: ${AI_MODEL:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
     depends_on:
       postgres:
         condition: service_healthy
