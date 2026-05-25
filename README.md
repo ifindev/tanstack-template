@@ -53,7 +53,13 @@ docker compose up postgres redis mailpit -d
 pnpm db:migrate
 ```
 
-### 5. Start the dev server
+### 5. Generate Prisma client
+
+```bash
+pnpm prisma generate
+```
+
+### 6. Start the dev server
 
 ```bash
 pnpm dev
