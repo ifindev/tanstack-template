@@ -2,7 +2,7 @@ allowBuilds:
   '0': '@prisma/engines'
   '1': prisma
   '@parcel/watcher': true
-  '@prisma/engines': set this to true or false
+  '@prisma/engines': false
   core-js: set this to true or false
   esbuild: true
   prisma: true

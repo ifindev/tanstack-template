@@ -96,6 +96,26 @@ AI_BASE_URL=https://openrouter.ai/api/v1
 AI_MODEL=openai/gpt-4o-mini
 ```
 
+## Generate `BETTER_AUTH_SECRET`
+
+`BETTER_AUTH_SECRET` is used by better-auth to sign session cookies and tokens. It must be a random string of at least 32 characters and must be kept secret — anyone with this value can forge sessions for your users.
+
+Generate one with any of the following:
+
+```bash
+# Recommended: better-auth CLI
+pnpm dlx @better-auth/cli secret
+
+# OpenSSL (32 random bytes, base64-encoded)
+openssl rand -base64 32
+
+# Node.js
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+
+Paste the result into `.env` as `BETTER_AUTH_SECRET=...`. Use a different value in every environment (local, staging, production) and never commit it to git.
+
+
 ## Docker (full stack)
 
 To run the entire stack in Docker:
