@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.output/
+build/
+coverage/
+*.tsbuildinfo
+
+# TanStack Router / Start generated files
+src/routeTree.gen.ts
+routeTree.gen.ts
+app.config.timestamp_*.js
+
+# Compiled JS artifacts emitted beside TypeScript source files
+src/**/*.js
+src/**/*.js.map
+
+# Environment and local secrets
+.env
+.env.*
+!.env.example
+
+# Package manager / tool state
+.pnpm-store/
+.pnpm-workspace-state.json
+.npm/
+.yarn/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# Framework and tooling caches
+.vite/
+.vite-temp/
+.turbo/
+.cache/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local workspace / agent artifacts
+.context/
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
