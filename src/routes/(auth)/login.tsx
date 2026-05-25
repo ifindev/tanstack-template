@@ -1,10 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { AlertCircle, Bot, Loader2, MailWarning } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
@@ -49,61 +56,96 @@ function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Sign in</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {unverified && (
-            <div className="mb-4 rounded-md bg-yellow-50 p-3 text-sm text-yellow-800">
-              Your email is not verified.{" "}
-              <button
-                type="button"
-                className="underline"
-                onClick={() => resendMutation.mutate({ email })}
-              >
-                Resend verification email
-              </button>
-            </div>
-          )}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-1">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" {...register("email")} />
-              {errors.email && (
-                <p className="text-sm text-destructive">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" {...register("password")} />
-              {errors.password && (
-                <p className="text-sm text-destructive">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-            {serverError && (
-              <p className="text-sm text-destructive">{serverError}</p>
+    <main className="flex min-h-screen items-center justify-center bg-muted/30 px-4 py-10">
+      <div className="w-full max-w-md">
+        <Link
+          to="/"
+          className="mx-auto mb-6 flex w-fit items-center gap-2 font-heading font-semibold"
+        >
+          <span className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+            <Bot className="size-4" />
+          </span>
+          TanStack Template
+        </Link>
+
+        <Card className="rounded-xl shadow-xs">
+          <CardHeader>
+            <CardTitle>Sign in</CardTitle>
+            <CardDescription>
+              Access your chat workspace and profile settings.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {unverified && (
+              <div className="mb-4 flex gap-3 rounded-lg border border-primary/20 bg-primary/10 p-3 text-sm text-primary">
+                <MailWarning className="mt-0.5 size-4 shrink-0" />
+                <div>
+                  <p className="font-medium">Your email is not verified.</p>
+                  <button
+                    type="button"
+                    className="mt-1 underline underline-offset-4"
+                    onClick={() => resendMutation.mutate({ email })}
+                  >
+                    Resend verification email
+                  </button>
+                </div>
+              </div>
             )}
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Signing in..." : "Sign in"}
-            </Button>
-            <p className="text-center text-sm text-muted-foreground">
-              Don&apos;t have an account?{" "}
-              <a
-                href="/register"
-                className="text-primary underline-offset-4 hover:underline"
-              >
-                Create one
-              </a>
-            </p>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  aria-invalid={!!errors.email}
+                  {...register("email")}
+                />
+                {errors.email && (
+                  <p className="text-sm text-destructive">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  aria-invalid={!!errors.password}
+                  {...register("password")}
+                />
+                {errors.password && (
+                  <p className="text-sm text-destructive">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+              {serverError && (
+                <div className="flex gap-2 rounded-lg border border-destructive/25 bg-destructive/10 p-3 text-sm text-destructive">
+                  <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                  <p>{serverError}</p>
+                </div>
+              )}
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : null}
+                {isSubmitting ? "Signing in..." : "Sign in"}
+              </Button>
+              <p className="text-center text-sm text-muted-foreground">
+                Don&apos;t have an account?{" "}
+                <Link
+                  to="/register"
+                  className="text-primary underline-offset-4 hover:underline"
+                >
+                  Create one
+                </Link>
+              </p>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </main>
   );
 }

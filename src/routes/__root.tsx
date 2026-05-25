@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import type { ReactNode } from "react";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { Sentry } from "@/shared/sentry/client";
 import "../styles/globals.css";
 
@@ -52,7 +53,7 @@ gtag('config', '${import.meta.env.VITE_GA_MEASUREMENT_ID}');
         )}
       </head>
       <body>
-        {children}
+        <TooltipProvider>{children}</TooltipProvider>
         <ScrollRestoration />
         <TanStackRouterDevtools />
         <Scripts />
