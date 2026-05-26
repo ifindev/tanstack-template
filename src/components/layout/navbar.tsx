@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import { BrandLockup } from "@/components/layout/brand";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 
@@ -12,10 +13,10 @@ export function Navbar() {
   };
 
   return (
-    <header className="border-b">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <a href="/" className="text-lg font-bold">
-          TanStack Template
+    <header className="border-b border-border/80 bg-background/90 backdrop-blur">
+      <div className="editorial-container flex h-16 items-center justify-between gap-4">
+        <a href="/" className="min-w-0">
+          <BrandLockup compact />
         </a>
         <nav className="flex items-center gap-4">
           {session?.user && (

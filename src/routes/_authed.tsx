@@ -30,20 +30,13 @@ function AuthenticatedLayout() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="min-h-svh overflow-hidden">
-        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+      <SidebarInset className="h-svh min-h-0 overflow-hidden">
+        <div className="sticky top-0 z-30 flex h-14 items-center border-b border-border/80 bg-background/92 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 md:hidden">
           <SidebarTrigger className="-ml-1" />
-          <div className="h-5 w-px bg-border" />
-          <div className="min-w-0">
-            <p className="truncate font-heading text-sm font-medium">
-              Workspace
-            </p>
-            <p className="truncate text-xs text-muted-foreground">
-              Authenticated app
-            </p>
-          </div>
-        </header>
-        <Outlet />
+        </div>
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <Outlet />
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

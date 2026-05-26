@@ -16,7 +16,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "TanStack Template" },
+      { title: "Northstar Start" },
     ],
   }),
   component: RootComponent,
@@ -52,7 +52,7 @@ gtag('config', '${import.meta.env.VITE_GA_MEASUREMENT_ID}');
           </>
         )}
       </head>
-      <body>
+      <body className="bg-background text-foreground">
         <TooltipProvider>{children}</TooltipProvider>
         <ScrollRestoration />
         <TanStackRouterDevtools />

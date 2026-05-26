@@ -20,10 +20,12 @@ Mailpit runs as a local SMTP sink via Docker Compose. It catches all outbound em
 docker compose up mailpit -d
 ```
 
-| What | Where |
-|---|---|
-| SMTP endpoint | `localhost:1025` |
-| Web UI | `http://localhost:8025` |
+
+| What          | Where                   |
+| ------------- | ----------------------- |
+| SMTP endpoint | `localhost:1025`        |
+| Web UI        | `http://localhost:8025` |
+
 
 The defaults in `.env.example` point at Mailpit. No additional configuration is needed for local development.
 
@@ -37,18 +39,22 @@ The transport uses `secure: false`, which is correct for port 587 (STARTTLS). Al
 
 Add these to your production environment (they are intentionally absent from `.env.example` since they are not needed locally):
 
-| Variable | Description |
-|---|---|
+
+| Variable    | Description                                             |
+| ----------- | ------------------------------------------------------- |
 | `SMTP_USER` | SMTP username (varies by provider — see examples below) |
-| `SMTP_PASS` | SMTP password or API key |
+| `SMTP_PASS` | SMTP password or API key                                |
+
 
 Plus update the existing vars:
 
-| Variable | Production value |
-|---|---|
-| `SMTP_HOST` | Your provider's SMTP hostname |
-| `SMTP_PORT` | `587` (STARTTLS) or `465` (SSL) |
+
+| Variable     | Production value                         |
+| ------------ | ---------------------------------------- |
+| `SMTP_HOST`  | Your provider's SMTP hostname            |
+| `SMTP_PORT`  | `587` (STARTTLS) or `465` (SSL)          |
 | `EMAIL_FROM` | A verified sender address on your domain |
+
 
 ### Resend
 

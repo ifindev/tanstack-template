@@ -4,6 +4,7 @@ import { CheckCircle2, Loader2, UserRound } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
+import { PageContainer, SurfacePanel } from "@/components/layout/editorial";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -47,75 +48,89 @@ function ProfilePage() {
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mb-6">
-        <p className="text-sm font-medium text-primary">Profile</p>
-        <h1 className="font-heading text-2xl font-semibold tracking-tight">
-          Account settings
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Update your workspace identity and review account details.
-        </p>
-      </div>
+    <main className="flex-1 py-8 sm:py-10">
+      <PageContainer className="space-y-8">
+        <div className="space-y-3">
+          <p className="section-label">Profile</p>
+          <h1 className="display-title">
+            Account details and workspace identity.
+          </h1>
+          <p className="max-w-2xl text-base leading-7 text-body sm:text-lg">
+            Keep the authenticated shell grounded in a real user record without
+            turning settings into an afterthought.
+          </p>
+        </div>
 
-      <div className="grid gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
-        <aside className="rounded-lg border bg-card p-4 text-card-foreground shadow-xs">
-          <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-md bg-primary/10 text-primary">
-              <UserRound className="size-5" />
-            </div>
-            <div className="min-w-0">
-              <p className="truncate font-heading font-medium">
-                {user?.name ?? "Account"}
-              </p>
-              <p className="truncate text-sm text-muted-foreground">
-                {user?.email ?? "Loading..."}
-              </p>
-            </div>
-          </div>
-        </aside>
-
-        <Card className="rounded-lg shadow-xs">
-          <CardHeader>
-            <CardTitle>Profile details</CardTitle>
-            <CardDescription>
-              This name appears in authenticated workspace views.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" {...register("name")} />
-                {errors.name && (
-                  <p className="text-sm text-destructive">
-                    {errors.name.message}
-                  </p>
-                )}
+        <div className="grid gap-6 xl:grid-cols-[22rem_minmax(0,1fr)]">
+          <SurfacePanel tone="card" padding="lg" className="space-y-6">
+            <div className="flex items-center gap-4">
+              <span className="flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <UserRound className="size-6" />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate font-heading text-xl font-semibold tracking-[-0.03em] text-foreground">
+                  {user?.name ?? "Account"}
+                </p>
+                <p className="truncate text-sm text-muted-foreground">
+                  {user?.email ?? "Loading..."}
+                </p>
               </div>
+            </div>
 
-              {success && (
-                <div className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/10 p-3 text-sm text-primary">
-                  <CheckCircle2 className="size-4" />
-                  Profile updated successfully.
+            <div className="rounded-xl border border-border bg-background p-4">
+              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                What this updates
+              </p>
+              <p className="mt-2 text-sm leading-7 text-body">
+                The display name shown across the authenticated workspace and
+                future collaboration surfaces.
+              </p>
+            </div>
+          </SurfacePanel>
+
+          <Card className="bg-background">
+            <CardHeader>
+              <CardTitle>Profile details</CardTitle>
+              <CardDescription>
+                This starter keeps profile editing deliberately small: one real
+                field, clearly persisted, easy to test.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input id="name" {...register("name")} />
+                  {errors.name && (
+                    <p className="text-sm text-destructive">
+                      {errors.name.message}
+                    </p>
+                  )}
                 </div>
-              )}
 
-              <Button
-                type="submit"
-                disabled={isSubmitting || updateMutation.isPending}
-              >
-                {isSubmitting || updateMutation.isPending ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : null}
-                {isSubmitting || updateMutation.isPending
-                  ? "Saving..."
-                  : "Save changes"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+                {success && (
+                  <div className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/10 p-4 text-sm text-body-strong">
+                    <CheckCircle2 className="size-4 text-primary" />
+                    Profile updated successfully.
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || updateMutation.isPending}
+                >
+                  {isSubmitting || updateMutation.isPending ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : null}
+                  {isSubmitting || updateMutation.isPending
+                    ? "Saving changes..."
+                    : "Save changes"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </PageContainer>
     </main>
   );
 }
