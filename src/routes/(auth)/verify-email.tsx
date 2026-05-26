@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { AlertCircle, Bot, CheckCircle2, Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
+import { AuthShell } from "@/components/layout/auth-shell";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -42,57 +43,54 @@ function VerifyEmailPage() {
   }, [token, navigate]);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-muted/30 px-4 py-10">
-      <div className="w-full max-w-md">
-        <Link
-          to="/"
-          className="mx-auto mb-6 flex w-fit items-center gap-2 font-heading font-semibold"
-        >
-          <span className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <Bot className="size-4" />
-          </span>
-          TanStack Template
-        </Link>
+    <AuthShell>
+      <Card className="bg-background">
+        <CardHeader>
+          {status === "verifying" && (
+            <StatusIcon>
+              <Loader2 className="size-5 animate-spin" />
+            </StatusIcon>
+          )}
+          {status === "success" && (
+            <StatusIcon>
+              <CheckCircle2 className="size-5" />
+            </StatusIcon>
+          )}
+          {status === "error" && (
+            <StatusIcon destructive>
+              <AlertCircle className="size-5" />
+            </StatusIcon>
+          )}
+          <CardTitle>
+            {status === "verifying" && "Verifying your email"}
+            {status === "success" && "Email verified"}
+            {status === "error" && "Verification failed"}
+          </CardTitle>
+          <CardDescription>
+            {status === "verifying" &&
+              "This handoff should only take a moment."}
+            {status === "success" &&
+              "The workspace is ready. Redirecting you to sign in."}
+            {status === "error" &&
+              "The verification link looks expired or invalid."}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {status === "error" && (
+            <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">
+              Try requesting a new email or return to sign in if the account is
+              already verified.
+            </div>
+          )}
 
-        <Card className="rounded-xl shadow-xs">
-          <CardHeader>
-            {status === "verifying" && (
-              <StatusIcon>
-                <Loader2 className="size-5 animate-spin" />
-              </StatusIcon>
-            )}
-            {status === "success" && (
-              <StatusIcon>
-                <CheckCircle2 className="size-5" />
-              </StatusIcon>
-            )}
-            {status === "error" && (
-              <StatusIcon destructive>
-                <AlertCircle className="size-5" />
-              </StatusIcon>
-            )}
-            <CardTitle>
-              {status === "verifying" && "Verifying your email"}
-              {status === "success" && "Email verified"}
-              {status === "error" && "Verification failed"}
-            </CardTitle>
-            <CardDescription>
-              {status === "verifying" && "This should only take a moment."}
-              {status === "success" && "Redirecting you to sign in."}
-              {status === "error" &&
-                "The verification link may be expired or invalid."}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {status === "error" && (
-              <Button className="w-full" asChild>
-                <Link to="/login">Go to sign in</Link>
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </main>
+          {status === "error" && (
+            <Button className="w-full" asChild>
+              <Link to="/login">Go to sign in</Link>
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    </AuthShell>
   );
 }
 
@@ -105,11 +103,11 @@ function StatusIcon({
 }) {
   return (
     <div
-      className={`mb-2 flex size-10 items-center justify-center rounded-md ${
+      className={
         destructive
-          ? "bg-destructive/10 text-destructive"
-          : "bg-primary/10 text-primary"
-      }`}
+          ? "mb-3 flex size-12 items-center justify-center rounded-xl bg-destructive/10 text-destructive"
+          : "mb-3 flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary"
+      }
     >
       {children}
     </div>
