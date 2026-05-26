@@ -15,7 +15,7 @@ export function SectionIntro({
   inverse = false,
   className,
 }: {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   description: string;
   inverse?: boolean;
@@ -23,11 +23,10 @@ export function SectionIntro({
 }) {
   return (
     <div className={cn("space-y-4", className)}>
-      <p
-        className={cn("section-label", inverse && "text-primary-foreground/80")}
-      >
-        {eyebrow}
-      </p>
+      {eyebrow && 
+        <p className={cn("section-label", inverse && "text-primary-foreground/80")}>
+          {eyebrow}
+      </p>}
       <div className="space-y-3">
         <h2
           className={cn("display-title max-w-3xl", inverse && "text-on-dark")}

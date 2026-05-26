@@ -1,4 +1,3 @@
-import { Compass } from "lucide-react";
 import type { ComponentPropsWithoutRef } from "react";
 import { cn } from "@/lib/utils";
 
@@ -11,11 +10,19 @@ export function BrandMark({
     <span
       aria-hidden="true"
       className={cn(
-        "inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-background text-primary",
+        "inline-flex shrink-0 items-center justify-center text-primary",
         className,
       )}
     >
-      <Compass className="size-4" />
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path d="M10 0L12.4 7.6L20 10L12.4 12.4L10 20L7.6 12.4L0 10L7.6 7.6Z" />
+      </svg>
     </span>
   );
 }
@@ -33,7 +40,7 @@ export function BrandLockup({
 }) {
   return (
     <span className={cn("flex items-center gap-3", className)}>
-      <BrandMark className={compact ? "size-9 rounded-lg" : undefined} />
+      <BrandMark />
       <span className="grid min-w-0 text-left leading-tight">
         <span
           className={cn(
