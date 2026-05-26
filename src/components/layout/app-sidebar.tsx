@@ -76,7 +76,7 @@ export function AppSidebar() {
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
-                size="lg"
+                size="default"
                 tooltip="Northstar Start"
                 className="h-auto p-0 hover:bg-transparent data-active:bg-transparent"
               >
@@ -126,7 +126,7 @@ export function AppSidebar() {
                   >
                     <SidebarMenuButton
                       asChild
-                      size="lg"
+                      size="default"
                       isActive={active}
                       tooltip={item.title}
                       className="group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center"
@@ -162,7 +162,7 @@ export function AppSidebar() {
                   >
                     <SidebarMenuButton
                       asChild
-                      size="lg"
+                      size="default"
                       isActive={active}
                       tooltip={item.title}
                       className="group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center"
