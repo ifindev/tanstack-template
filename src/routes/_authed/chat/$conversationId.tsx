@@ -1,12 +1,16 @@
 import { useChat } from "@ai-sdk/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { DefaultChatTransport } from "ai";
-import { AlertCircle, Bot, Loader2, Send, UserRound } from "lucide-react";
+import { AlertCircle, ArrowDown, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { PageContainer } from "@/components/layout/editorial";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
+import {
+  type ConversationUiMessage,
+  ConversationPanel,
+} from "./conversation-panel";
 
 type ConversationMessage = {
   id: string;
@@ -23,24 +27,28 @@ function ConversationPage() {
   const { conversationId } = Route.useParams();
   const { data: features, isLoading: isLoadingFeatures } =
     trpc.config.features.useQuery();
-  const { data: conversation } = trpc.chat.getConversation.useQuery({
-    id: conversationId,
-  });
+  const {
+    data: conversation,
+    isFetching: isFetchingConversation,
+    isLoading: isLoadingConversation,
+  } = trpc.chat.getConversation.useQuery({ id: conversationId });
   const bottomRef = useRef<HTMLDivElement>(null);
+  const hydratedConversationIdRef = useRef<string | null>(null);
   const [input, setInput] = useState("");
+  const [isAtBottom, setIsAtBottom] = useState(true);
 
-  const initialMessages = conversation?.messages.map(
+  const initialMessages: ConversationUiMessage[] =
+    conversation?.messages.map(
     (message: ConversationMessage) => ({
       id: message.id,
       role: message.role as "user" | "assistant" | "system",
       parts: [{ type: "text" as const, text: message.content }],
-      createdAt: new Date(message.createdAt),
     }),
-  );
+  ) ?? [];
   const chatEnabled = features?.chatEnabled ?? false;
   const [chatError, setChatError] = useState<string | null>(null);
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, setMessages, status } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
       body: { conversationId },
@@ -54,8 +62,33 @@ function ConversationPage() {
     },
   });
 
-  const isLoading = status === "streaming" || status === "submitted";
-  const composerDisabled = isLoadingFeatures || !chatEnabled || isLoading;
+  const isResponding = status === "streaming" || status === "submitted";
+  const isConversationLoading =
+    (isLoadingConversation || isFetchingConversation) && !conversation;
+  const composerDisabled =
+    isLoadingFeatures || !chatEnabled || isResponding || isConversationLoading;
+
+  useEffect(() => {
+    hydratedConversationIdRef.current = null;
+  }, [conversationId]);
+
+  useEffect(() => {
+    if (!conversation) return;
+    if (hydratedConversationIdRef.current === conversationId) return;
+
+    setMessages(initialMessages);
+    hydratedConversationIdRef.current = conversationId;
+  }, [conversation, conversationId, initialMessages, setMessages]);
+
+  useEffect(() => {
+    const el = bottomRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) =>
+      setIsAtBottom(entry?.isIntersecting ?? true),
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to bottom when messages change
   useEffect(() => {
@@ -70,149 +103,85 @@ function ConversationPage() {
     setInput("");
   };
 
-  const getMessageText = (chatMessage: (typeof messages)[number]): string =>
-    chatMessage.parts
-      .filter(
-        (messagePart): messagePart is { type: "text"; text: string } =>
-          messagePart.type === "text",
-      )
-      .map((messagePart) => messagePart.text)
-      .join("");
-
   return (
-    <main className="flex min-h-0 flex-1 flex-col">
-      <div className="sticky top-14 z-20 border-b bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:px-6">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
-          <div className="min-w-0">
-            <p className="truncate font-heading text-base font-semibold">
-              {conversation?.title ?? "Loading conversation"}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Messages are saved to this thread.
-            </p>
-          </div>
-          {isLoading && (
-            <div className="flex shrink-0 items-center gap-2 rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
-              <Loader2 className="size-3 animate-spin" />
-              Responding
-            </div>
-          )}
-        </div>
+    <main className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+      <div className="min-h-0 flex-1 overflow-hidden">
+        <PageContainer className="flex h-full min-h-0 flex-col py-6 sm:py-8">
+          <ConversationPanel
+            bottomRef={bottomRef}
+            isConversationLoading={isConversationLoading}
+            isResponding={isResponding}
+            messages={messages as ConversationUiMessage[]}
+            title={conversation?.title}
+          />
+        </PageContainer>
       </div>
 
-      <ScrollArea className="min-h-0 flex-1">
-        <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-6 sm:px-6">
-          {messages.length === 0 && !isLoading && (
-            <div className="rounded-lg border border-dashed bg-card p-8 text-center text-card-foreground">
-              <div className="mx-auto flex size-10 items-center justify-center rounded-md bg-muted">
-                <Bot className="size-5 text-muted-foreground" />
-              </div>
-              <h2 className="mt-3 font-heading text-base font-medium">
-                Start the conversation
-              </h2>
-              <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
-                Send a message when the AI provider is configured.
-              </p>
-            </div>
-          )}
-
-          {messages.map((chatMessage) => {
-            const isUser = chatMessage.role === "user";
-            return (
-              <div
-                key={chatMessage.id}
-                className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"}`}
-              >
-                {!isUser && (
-                  <span className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
-                    <Bot className="size-4" />
-                  </span>
-                )}
-                <div
-                  className={`max-w-[min(42rem,85%)] rounded-lg px-4 py-3 text-sm shadow-xs ${
-                    isUser
-                      ? "bg-primary text-primary-foreground"
-                      : "border bg-card text-card-foreground"
-                  }`}
-                >
-                  <p className="whitespace-pre-wrap break-words leading-relaxed">
-                    {getMessageText(chatMessage)}
-                  </p>
-                </div>
-                {isUser && (
-                  <span className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                    <UserRound className="size-4" />
-                  </span>
-                )}
-              </div>
-            );
-          })}
-
-          {isLoading && (
-            <div className="flex justify-start gap-3">
-              <span className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
-                <Bot className="size-4" />
-              </span>
-              <div className="rounded-lg border bg-card px-4 py-3 text-sm text-muted-foreground shadow-xs">
-                Thinking...
-              </div>
-            </div>
-          )}
-          <div ref={bottomRef} />
-        </div>
-      </ScrollArea>
-
-      <form
-        onSubmit={handleSubmit}
-        className="border-t bg-background/95 p-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:px-6"
-      >
-        <div className="mx-auto max-w-5xl space-y-3">
+      <div className="relative shrink-0 border-t border-border/80 bg-background/92 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        {!isAtBottom && (
+          <div className="absolute bottom-full left-1/2 z-10 mb-3 -translate-x-1/2">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="rounded-full shadow-md"
+              onClick={() =>
+                bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+              }
+            >
+              <ArrowDown className="size-4" />
+            </Button>
+          </div>
+        )}
+        <PageContainer className="space-y-3">
           {!isLoadingFeatures && !chatEnabled && (
-            <div className="flex gap-3 rounded-lg border border-destructive/25 bg-destructive/10 p-3 text-sm text-destructive">
+            <div className="flex gap-3 rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
               <AlertCircle className="mt-0.5 size-4 shrink-0" />
               <div>
                 <p className="font-medium">Chat provider is not configured.</p>
                 <p className="mt-1 text-destructive/85">
-                  Set AI_API_KEY and AI_MODEL to send messages.
+                  Set `AI_API_KEY` and `AI_MODEL` to send messages.
                 </p>
               </div>
             </div>
           )}
           {chatError && (
-            <div className="flex gap-3 rounded-lg border border-destructive/25 bg-destructive/10 p-3 text-sm text-destructive">
+            <div className="flex gap-3 rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
               <AlertCircle className="mt-0.5 size-4 shrink-0" />
               <p>{chatError}</p>
             </div>
           )}
-          <div className="flex flex-col gap-2 rounded-lg border bg-card p-2 shadow-xs sm:flex-row sm:items-end">
-            <Textarea
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              placeholder={
-                chatEnabled ? "Type a message..." : "Chat is disabled"
-              }
-              className="max-h-48 min-h-20 resize-none border-0 bg-transparent shadow-none focus-visible:ring-0"
-              disabled={composerDisabled}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" && !event.shiftKey) {
-                  event.preventDefault();
-                  handleSubmit(
-                    event as unknown as React.FormEvent<HTMLFormElement>,
-                  );
+          <form onSubmit={handleSubmit}>
+            <div className="surface-card flex flex-col gap-3 p-3 sm:flex-row sm:items-end">
+              <Textarea
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                placeholder={
+                  chatEnabled ? "Write the next message..." : "Chat is disabled"
                 }
-              }}
-            />
-            <Button
-              type="submit"
-              disabled={composerDisabled || !input.trim()}
-              className="w-full sm:w-auto"
-            >
-              <Send className="size-4" />
-              Send
-            </Button>
-          </div>
-        </div>
-      </form>
+                className="max-h-48 min-h-24 resize-none border-0 bg-transparent shadow-none focus-visible:ring-0"
+                disabled={composerDisabled}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && !event.shiftKey) {
+                    event.preventDefault();
+                    handleSubmit(
+                      event as unknown as React.FormEvent<HTMLFormElement>,
+                    );
+                  }
+                }}
+              />
+              <Button
+                type="submit"
+                disabled={composerDisabled || !input.trim()}
+                className="w-full sm:w-auto"
+              >
+                <Send className="size-4" />
+                Send
+              </Button>
+            </div>
+          </form>
+        </PageContainer>
+      </div>
     </main>
   );
 }
