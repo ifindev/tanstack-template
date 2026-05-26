@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { AlertCircle, Bot, Loader2, MailWarning } from "lucide-react";
+import { AlertCircle, Loader2, MailWarning } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
+import { AuthShell } from "@/components/layout/auth-shell";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,9 +27,9 @@ type FormData = z.infer<typeof loginSchema>;
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [serverError, setServerError] = useState<string | null>(null);
-  const [unverified, setUnverified] = useState(false);
   const [email, setEmail] = useState("");
+  const [unverified, setUnverified] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const {
     register,
@@ -56,96 +57,90 @@ function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-muted/30 px-4 py-10">
-      <div className="w-full max-w-md">
-        <Link
-          to="/"
-          className="mx-auto mb-6 flex w-fit items-center gap-2 font-heading font-semibold"
-        >
-          <span className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <Bot className="size-4" />
-          </span>
-          TanStack Template
-        </Link>
+    <AuthShell>
+      <Card className="bg-background">
+        <CardHeader>
+          <CardTitle>Sign in</CardTitle>
+          <CardDescription>
+            Enter your email and password to continue.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {unverified && (
+            <div className="mb-5 flex gap-3 rounded-lg border border-primary/20 bg-primary/10 p-4 text-sm text-body-strong">
+              <MailWarning className="mt-0.5 size-4 shrink-0 text-primary" />
+              <div>
+                <p className="font-medium text-foreground">
+                  Your email still needs verification.
+                </p>
+                <button
+                  type="button"
+                  className="mt-1 text-primary underline-offset-4 hover:underline"
+                  onClick={() => resendMutation.mutate({ email })}
+                >
+                  Resend verification email
+                </button>
+              </div>
+            </div>
+          )}
 
-        <Card className="rounded-xl shadow-xs">
-          <CardHeader>
-            <CardTitle>Sign in</CardTitle>
-            <CardDescription>
-              Access your chat workspace and profile settings.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {unverified && (
-              <div className="mb-4 flex gap-3 rounded-lg border border-primary/20 bg-primary/10 p-3 text-sm text-primary">
-                <MailWarning className="mt-0.5 size-4 shrink-0" />
-                <div>
-                  <p className="font-medium">Your email is not verified.</p>
-                  <button
-                    type="button"
-                    className="mt-1 underline underline-offset-4"
-                    onClick={() => resendMutation.mutate({ email })}
-                  >
-                    Resend verification email
-                  </button>
-                </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                aria-invalid={!!errors.email}
+                {...register("email")}
+              />
+              {errors.email && (
+                <p className="text-sm text-destructive">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                aria-invalid={!!errors.password}
+                {...register("password")}
+              />
+              {errors.password && (
+                <p className="text-sm text-destructive">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            {serverError && (
+              <div className="flex gap-3 rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">
+                <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                <p>{serverError}</p>
               </div>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  aria-invalid={!!errors.email}
-                  {...register("email")}
-                />
-                {errors.email && (
-                  <p className="text-sm text-destructive">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  aria-invalid={!!errors.password}
-                  {...register("password")}
-                />
-                {errors.password && (
-                  <p className="text-sm text-destructive">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
-              {serverError && (
-                <div className="flex gap-2 rounded-lg border border-destructive/25 bg-destructive/10 p-3 text-sm text-destructive">
-                  <AlertCircle className="mt-0.5 size-4 shrink-0" />
-                  <p>{serverError}</p>
-                </div>
-              )}
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : null}
-                {isSubmitting ? "Signing in..." : "Sign in"}
-              </Button>
-              <p className="text-center text-sm text-muted-foreground">
-                Don&apos;t have an account?{" "}
-                <Link
-                  to="/register"
-                  className="text-primary underline-offset-4 hover:underline"
-                >
-                  Create one
-                </Link>
-              </p>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    </main>
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : null}
+              {isSubmitting ? "Signing you in..." : "Sign in"}
+            </Button>
+
+            <p className="text-center text-sm text-muted-foreground">
+              Need an account?{" "}
+              <Link
+                to="/register"
+                className="text-primary underline-offset-4 hover:underline"
+              >
+                Create one
+              </Link>
+            </p>
+          </form>
+        </CardContent>
+      </Card>
+    </AuthShell>
   );
 }

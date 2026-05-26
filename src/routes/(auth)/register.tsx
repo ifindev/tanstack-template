@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertCircle, Bot, Loader2, MailCheck } from "lucide-react";
-import type { ReactNode } from "react";
+import { AlertCircle, Loader2, MailCheck } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
+import { AuthShell } from "@/components/layout/auth-shell";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -47,42 +47,39 @@ function RegisterPage() {
 
   if (success) {
     return (
-      <AuthSurface>
-        <Card className="rounded-xl shadow-xs">
+      <AuthShell>
+        <Card className="bg-background">
           <CardHeader>
-            <div className="mb-2 flex size-10 items-center justify-center rounded-md bg-primary/10 text-primary">
+            <div className="mb-3 flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
               <MailCheck className="size-5" />
             </div>
             <CardTitle>Check your email</CardTitle>
             <CardDescription>
-              We sent a verification link to your inbox.
+              We sent a verification link. Click it to activate your account.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Click the link in that email to verify your account before signing
-              in.
-            </p>
-            <Button className="mt-6 w-full" asChild>
+            <Button className="w-full" asChild>
               <Link to="/login">Back to sign in</Link>
             </Button>
           </CardContent>
         </Card>
-      </AuthSurface>
+      </AuthShell>
     );
   }
 
   return (
-    <AuthSurface>
-      <Card className="rounded-xl shadow-xs">
+    <AuthShell>
+      <Card className="bg-background">
         <CardHeader>
           <CardTitle>Create an account</CardTitle>
           <CardDescription>
-            Start with email verification, then enter the workspace.
+            Enter your details. You'll receive a verification email before
+            signing in.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
               <Input
@@ -96,6 +93,7 @@ function RegisterPage() {
                 </p>
               )}
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -110,6 +108,7 @@ function RegisterPage() {
                 </p>
               )}
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -124,20 +123,23 @@ function RegisterPage() {
                 </p>
               )}
             </div>
+
             {serverError && (
-              <div className="flex gap-2 rounded-lg border border-destructive/25 bg-destructive/10 p-3 text-sm text-destructive">
+              <div className="flex gap-3 rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">
                 <AlertCircle className="mt-0.5 size-4 shrink-0" />
                 <p>{serverError}</p>
               </div>
             )}
+
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : null}
               {isSubmitting ? "Creating account..." : "Create account"}
             </Button>
+
             <p className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
+              Already set up?{" "}
               <Link
                 to="/login"
                 className="text-primary underline-offset-4 hover:underline"
@@ -148,25 +150,6 @@ function RegisterPage() {
           </form>
         </CardContent>
       </Card>
-    </AuthSurface>
-  );
-}
-
-function AuthSurface({ children }: { children: ReactNode }) {
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-muted/30 px-4 py-10">
-      <div className="w-full max-w-md">
-        <Link
-          to="/"
-          className="mx-auto mb-6 flex w-fit items-center gap-2 font-heading font-semibold"
-        >
-          <span className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <Bot className="size-4" />
-          </span>
-          TanStack Template
-        </Link>
-        {children}
-      </div>
-    </main>
+    </AuthShell>
   );
 }
