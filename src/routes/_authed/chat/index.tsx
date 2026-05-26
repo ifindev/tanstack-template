@@ -88,13 +88,13 @@ function ChatListPage() {
         )}
 
         <div className="space-y-6">
-          <div className="relative max-w-4xl">
-            <Search className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted-foreground" />
+          <div className="relative">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search chats..."
-              className="h-15 rounded-2xl bg-background pr-4 pl-12 text-lg"
+              className="h-10 rounded-xl bg-background pr-4 pl-10 text-sm"
             />
           </div>
 
