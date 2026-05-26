@@ -143,7 +143,7 @@ function ChatListPage() {
                 >
                   <div className="flex items-center justify-between gap-6">
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-xl font-medium text-foreground">
+                      <span className="block truncate text-base font-medium leading-[1.4] text-foreground">
                         {conv.title}
                       </span>
                       <span className="mt-2 block text-sm text-muted-foreground sm:hidden">

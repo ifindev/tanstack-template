@@ -376,7 +376,7 @@ The display/body split is editorial:
 | `{typography.display-sm}` | 28px | 400 | 1.2 | -0.3px | Pricing tier names, callout headlines — Copernicus |
 | `{typography.title-lg}` | 22px | 500 | 1.3 | 0 | Pricing plan size labels — StyreneB |
 | `{typography.title-md}` | 18px | 500 | 1.4 | 0 | Feature card titles, intro paragraphs |
-| `{typography.title-sm}` | 16px | 500 | 1.4 | 0 | Connector tile titles, list labels |
+| `{typography.title-sm}` | 16px | 500 | 1.4 | 0 | Connector tile titles, list labels, conversation row titles |
 | `{typography.body-md}` | 16px | 400 | 1.55 | 0 | Default running-text — StyreneB |
 | `{typography.body-sm}` | 14px | 400 | 1.55 | 0 | Footer body, fine-print |
 | `{typography.caption}` | 13px | 500 | 1.4 | 0 | Badge labels, captions |
@@ -493,6 +493,8 @@ When photography is used (rare — mostly testimonials), avatars crop to perfect
 **`callout-card-coral`** — A full-bleed coral card carrying a major call-to-action. Background `{colors.primary}` (#cc785c), text `{colors.on-primary}` (white), rounded `{rounded.lg}`, padding `{spacing.xxl}` (48px). The coral surface IS the voltage; the CTA inside uses an inverted button style (cream/canvas button on coral).
 
 **`connector-tile`** — Used on the connectors page's integration grid. Background `{colors.canvas}` with hairline border, rounded `{rounded.lg}`, padding 20px. Each tile carries a logo at top, a `{typography.title-sm}` connector name, and a short description.
+
+**`conversation-list-row`** — Used in product chat history lists on cream surfaces. The row title uses `{typography.title-sm}` so it aligns with the rest of the body system instead of reading like a section heading; timestamps and supporting metadata should stay at `{typography.body-sm}` in `{colors.muted}`. Rows can use hairline dividers and generous vertical padding, but the title should remain body-scale.
 
 ### Inputs & Forms
 
