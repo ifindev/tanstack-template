@@ -1,6 +1,8 @@
+import { Link } from "@tanstack/react-router";
 import type { UIMessage } from "ai";
-import { Bot, Loader2, UserRound } from "lucide-react";
+import { ArrowLeft, Bot, Loader2, UserRound } from "lucide-react";
 import type { ReactNode, RefObject } from "react";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export type ConversationUiMessage = UIMessage;
@@ -14,6 +16,11 @@ type ConversationPanelProps = {
 };
 
 const skeletonRows = [
+  {
+    id: "user-question",
+    role: "user" as const,
+    widths: ["w-32"],
+  },
   {
     id: "assistant-intro",
     role: "assistant" as const,
@@ -60,8 +67,13 @@ export function ConversationPanel({
 }: ConversationPanelProps) {
   return (
     <section className="flex min-h-0 flex-1 flex-col rounded-[2rem] bg-background">
-      <div className="flex shrink-0 items-start justify-between gap-4 px-4 pb-4 sm:px-5">
-        <p className="truncate font-heading text-xl font-semibold tracking-[-0.03em] text-foreground sm:text-2xl">
+      <div className="flex shrink-0 items-center gap-2 px-4 pb-4 sm:px-5">
+        <Button variant="ghost" size="icon" className="shrink-0" asChild>
+          <Link to="/chat">
+            <ArrowLeft className="size-4" />
+          </Link>
+        </Button>
+        <p className="truncate font-heading text-lg font-semibold tracking-[-0.03em] text-foreground sm:text-xl flex-1">
           {title ?? "Loading conversation"}
         </p>
         {isResponding && (
