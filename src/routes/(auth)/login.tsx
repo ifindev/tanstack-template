@@ -53,7 +53,7 @@ function LoginPage() {
       }
       return;
     }
-    navigate({ to: "/profile" });
+    navigate({ to: "/chat" });
   };
 
   return (
