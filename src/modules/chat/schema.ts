@@ -1,13 +1,9 @@
 import { z } from "zod";
-import { DEFAULT_CONVERSATION_TITLE } from "./constants";
-
-export const createConversationSchema = z.object({
-  title: z.string().min(1).max(200).default(DEFAULT_CONVERSATION_TITLE),
-});
+import { MAX_CONVERSATION_TITLE_LENGTH } from "./constants";
 
 export const renameConversationSchema = z.object({
   id: z.string(),
-  title: z.string().min(1).max(200),
+  title: z.string().min(1).max(MAX_CONVERSATION_TITLE_LENGTH),
 });
 
 export const deleteConversationSchema = z.object({

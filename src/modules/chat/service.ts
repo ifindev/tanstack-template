@@ -25,6 +25,12 @@ export async function getConversationWithMessages(userId: string, id: string) {
   });
 }
 
+export async function getConversation(userId: string, id: string) {
+  return prisma.conversation.findFirst({
+    where: { id, userId },
+  });
+}
+
 export async function renameConversation(
   userId: string,
   id: string,
