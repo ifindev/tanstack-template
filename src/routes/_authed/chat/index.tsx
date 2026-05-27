@@ -34,14 +34,6 @@ function ChatListPage() {
       item.title.toLowerCase().includes(normalizedQuery),
     );
   }, [data?.items, query]);
-  const createMutation = trpc.chat.createConversation.useMutation({
-    onSuccess: (conv) =>
-      navigate({
-        to: "/chat/$conversationId",
-        params: { conversationId: conv.id },
-      }),
-  });
-
   return (
     <main className="flex-1 py-6 sm:py-8">
       <PageContainer className="max-w-6xl space-y-8">
@@ -57,19 +49,11 @@ function ChatListPage() {
               Select chats
             </Button>
             <Button
-              onClick={() =>
-                createMutation.mutate({ title: "New conversation" })
-              }
-              disabled={
-                !chatEnabled || isLoadingFeatures || createMutation.isPending
-              }
+              onClick={() => navigate({ to: "/chat/new" })}
+              disabled={!chatEnabled || isLoadingFeatures}
               className="w-full sm:w-auto"
             >
-              {createMutation.isPending ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <MessageSquarePlus className="size-4" />
-              )}
+              <MessageSquarePlus className="size-4" />
               New chat
             </Button>
           </div>
