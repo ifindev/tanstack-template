@@ -25,6 +25,7 @@ export function getRouter() {
   const router = createTanStackRouter({
     routeTree,
     context: {},
+    scrollRestoration: true,
     Wrap: ({ children }) => (
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
