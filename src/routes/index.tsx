@@ -2,10 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { type CSSProperties, useState } from "react";
 import { BrandLockup } from "@/components/layout/brand";
-import {
-  PageContainer,
-  SurfacePanel,
-} from "@/components/layout/editorial";
+import { PageContainer, SurfacePanel } from "@/components/layout/editorial";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -112,10 +109,12 @@ function LandingPage() {
                     strokeLinecap="round"
                     pathLength="1"
                     strokeDasharray="1"
-                    style={{
-                      strokeDashoffset: "0",
-                      animation: "draw-path 0.9s ease-out 0.2s both",
-                    } as CSSProperties}
+                    style={
+                      {
+                        strokeDashoffset: "0",
+                        animation: "draw-path 0.9s ease-out 0.2s both",
+                      } as CSSProperties
+                    }
                   />
                 </svg>
                 <svg
@@ -134,10 +133,12 @@ function LandingPage() {
                     strokeLinecap="round"
                     pathLength="1"
                     strokeDasharray="1"
-                    style={{
-                      strokeDashoffset: "0",
-                      animation: "draw-path 0.9s ease-out 0.2s both",
-                    } as CSSProperties}
+                    style={
+                      {
+                        strokeDashoffset: "0",
+                        animation: "draw-path 0.9s ease-out 0.2s both",
+                      } as CSSProperties
+                    }
                   />
                 </svg>
                 <h1 className="display-hero">
@@ -145,7 +146,8 @@ function LandingPage() {
                 </h1>
               </div>
               <p className="body-lead mx-auto max-w-2xl">
-                Auth, database, AI streaming, and rate limiting — pre-wired. <br/>
+                Auth, database, AI streaming, and rate limiting — pre-wired.{" "}
+                <br />
                 Clone and spend day one on your actual idea.
               </p>
             </div>
@@ -326,42 +328,56 @@ function LandingPage() {
                   <span className="text-[#cf9f7a]">z</span>
                   <span className="text-[#e8e4dd]">.string(),</span>
                   {"\n"}
-                  <span className="text-[#e8e4dd]">{"      "}body:{"  "}</span>
+                  <span className="text-[#e8e4dd]">
+                    {"      "}body:{"  "}
+                  </span>
                   <span className="text-[#cf9f7a]">z</span>
                   <span className="text-[#e8e4dd]">.string(),</span>
                   {"\n"}
-                  <span className="text-[#e8e4dd]">{"    "}{"})"}))</span>
+                  <span className="text-[#e8e4dd]">
+                    {"    "}
+                    {"})"}))
+                  </span>
                   {"\n"}
                   <span className="text-[#e8e4dd]">{"    "}.mutation(</span>
                   <span className="text-[#cf9f7a]">async</span>
-                  <span className="text-[#e8e4dd]">{" ({ ctx, input }) => {"}</span>
+                  <span className="text-[#e8e4dd]">
+                    {" ({ ctx, input }) => {"}
+                  </span>
                   {"\n"}
                   <span className="text-[#e8e4dd]">{"      "}return </span>
                   <span className="text-[#cf9f7a]">createPost</span>
                   <span className="text-[#e8e4dd]">{"({"}</span>
                   {"\n"}
-                  <span className="text-[#e8e4dd]">{"        "}userId: ctx.user.id,</span>
+                  <span className="text-[#e8e4dd]">
+                    {"        "}userId: ctx.user.id,
+                  </span>
                   {"\n"}
                   <span className="text-[#e8e4dd]">{"        "}...input,</span>
                   {"\n"}
-                  <span className="text-[#e8e4dd]">{"      "}{"})"}</span>
+                  <span className="text-[#e8e4dd]">
+                    {"      "}
+                    {"})"}
+                  </span>
                   {"\n"}
-                  <span className="text-[#e8e4dd]">{"    "}{"}),"}</span>
+                  <span className="text-[#e8e4dd]">
+                    {"    "}
+                    {"}),"}
+                  </span>
                   {"\n"}
                   <span className="text-[#e8e4dd]">{"});"}</span>
                 </code>
               </pre>
               <div className="border-t border-white/8 px-5 py-4">
                 <p className="text-sm leading-6 text-[#e8e4dd]/60">
-                  Add a feature in 3 files. Your AI agent does the same —
-                  every time, without guesswork.
+                  Add a feature in 3 files. Your AI agent does the same — every
+                  time, without guesswork.
                 </p>
               </div>
             </div>
           </div>
         </PageContainer>
       </section>
-
 
       {/* ── AI-Assisted Development ──────────────────────── */}
       <section id="agents" className="section-space bg-surface-soft/55">
@@ -377,8 +393,7 @@ function LandingPage() {
             {[
               {
                 num: "01",
-                title:
-                  "Your AI reads the architecture before touching a file.",
+                title: "Your AI reads the architecture before touching a file.",
                 body: "CLAUDE.md gives every agent session full context — commands, patterns, and gotchas included.",
               },
               {
@@ -392,7 +407,12 @@ function LandingPage() {
                 body: "schema → service → router. Consistent enough that Cursor never guesses where things go.",
               },
             ].map(({ num, title, body }) => (
-              <SurfacePanel key={num} tone="card" padding="lg" className="space-y-4">
+              <SurfacePanel
+                key={num}
+                tone="card"
+                padding="lg"
+                className="space-y-4"
+              >
                 <span className="font-mono text-4xl font-bold leading-none text-primary/20">
                   {num}
                 </span>
