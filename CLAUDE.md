@@ -119,6 +119,7 @@ vi.mocked(prisma.conversation.create).mockResolvedValueOnce(fake as never);
 
 Detailed references in `docs/guides/`. Read these before working on the relevant area:
 
+- **`docs/guides/application-architecture.md`** — ViewModel pattern, three-layer architecture (Route/View, ViewModel, Components), data flow, naming conventions, and rules. **START HERE when building new pages.**
 - `docs/guides/environment-setup.md` — env vars, Docker services, how variables are consumed, production notes
 - `docs/guides/observability.md` — logging with pino, Sentry error tracking, health endpoint
 - `docs/guides/analytics.md` — GA4 setup and conditional script injection
