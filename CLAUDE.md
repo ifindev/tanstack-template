@@ -110,6 +110,7 @@ vi.mocked(prisma.conversation.create).mockResolvedValueOnce(fake as never);
 
 - **Imports**: use `@/` alias (maps to `src/`), never relative paths crossing module boundaries
 - **Zod + react-hook-form**: cast schema as `any` in `zodResolver` if resolver generics drift from schema types.
+- **Components**: All React components live under `src/components/`. Never define a reusable component inside `src/routes/` — routes are for pages only. Use `ui/` for shadcn primitives, `layout/` for app-wide layout, and `<feature>/` subdirectories (e.g., `chat/`) for feature-specific components. Each component file exports one component as a `default export` using a `function` declaration (not an arrow function). See `docs/guides/component-creation.md`.
 - **CSS**: Tailwind v4 (`@import "tailwindcss"`) — `globals.css` is excluded from Biome
 - **Biome**: 2-space indent, double quotes, trailing commas. Run `pnpm format` to auto-fix; unsafe fixes (bracket notation → dot notation) apply manually
 - **No comments** unless the why is non-obvious
@@ -127,6 +128,7 @@ Detailed references in `docs/guides/`. Read these before working on the relevant
 - `docs/guides/tanstack-start-routing-auth.md` — file-based routing conventions, auth guard layout, public vs private routes
 - `docs/guides/tanstack-start-server-primitives.md` — when to use `createServerFn` vs `server.handlers` vs tRPC
 - `docs/guides/trpc-new-endpoints.md` — step-by-step: schema → service → router → register
+- `docs/guides/component-creation.md` — component placement rules, one-per-file convention, directory map
 
 ## Gotchas
 

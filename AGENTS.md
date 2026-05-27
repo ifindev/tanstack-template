@@ -167,9 +167,29 @@ All DB access goes through the singleton in `src/shared/db/prisma.ts`. Never ins
 
 ## Adding UI Components
 
-Use existing shadcn/ui primitives from `src/components/ui/` (Button, Input, Card, etc.). Do not modify files in that directory — they are shadcn-managed. For new shared UI, add to `src/components/`.
+**Read `docs/guides/component-creation.md` before creating any new component.**
 
-Always use the `cn()` utility from `src/lib/utils.ts` for conditional class merging.
+All React components live under `src/components/`. Never define a reusable component inside `src/routes/` — route files are for pages only (the `Route` export and its single page component).
+
+| Directory | Purpose |
+|-----------|---------|
+| `src/components/ui/` | shadcn/ui primitives — do not modify or add files here manually |
+| `src/components/layout/` | App-wide layout components shared across features |
+| `src/components/<feature>/` | Feature-specific components (e.g., `chat/`, `dashboard/`) |
+
+Each component file must:
+- Export **one** React component as a **`default export`**
+- Use a **`function` declaration**, not an arrow function
+- Named exports for types and utility functions in the same file are fine
+
+```tsx
+// correct
+export default function ConversationPanel({ ... }: ConversationPanelProps) {
+  return ...;
+}
+```
+
+Use existing shadcn/ui primitives from `src/components/ui/` (Button, Input, Card, etc.). Always use the `cn()` utility from `src/lib/utils.ts` for conditional class merging.
 
 ## Testing
 
@@ -202,3 +222,61 @@ Detailed architectural references in `docs/guides/`. Consult these when the rele
 | `docs/guides/tanstack-start-routing-auth.md` | Adding or modifying routes, auth guards, public vs private pages |
 | `docs/guides/tanstack-start-server-primitives.md` | Choosing between `createServerFn`, `server.handlers`, and tRPC for a new server-side behavior |
 | `docs/guides/trpc-new-endpoints.md` | Adding a new tRPC module (schema → service → router → register) |
+| `docs/guides/component-creation.md` | Creating or moving any React component |
+
+## Commit Workflow
+
+Use atomic conventional commits. Follow all rules below exactly.
+
+### Commit format
+
+```
+<type>(<scope>): <imperative description under 72 chars>
+
+- specific change made
+- another specific change
+```
+
+Valid types: `feat` `fix` `refactor` `style` `test` `docs` `chore` `perf`
+
+### Scope inference
+
+Derive scope from the file path:
+
+| Path | Scope |
+|------|-------|
+| `src/modules/<name>/` | `<name>` |
+| `src/components/<name>/` | `<name>` (use `ui` for `components/ui/`) |
+| `src/routes/(auth)/` | `auth` |
+| `src/routes/_authed/<name>` | `<name>` |
+| `src/routes/api/` | `api` |
+| `src/routes/` root files | `routes` |
+| `src/shared/<name>/` | `<name>` |
+| `src/lib/` | `lib` |
+| `prisma/` | `db` |
+| `docs/`, `*.md` at root | `docs` |
+| `package.json`, lock files | `deps` |
+| Other root config | `config` |
+
+### Atomicity rules
+
+- Default: one file per commit.
+- Group together only when in the same scope (max 3 files):
+  - `schema.ts` + `service.ts` in the same module
+  - Any `*.test.ts` / `*.test.tsx` with the source file it tests
+- Never group files from different modules or scopes in one commit.
+- Auto-generated files (`routeTree.gen.ts`, `pnpm-lock.yaml`) go in their own `chore` commits, executed last.
+
+### Staging rules
+
+- **Never** use `git add .` or `git add -A`.
+- Stage files explicitly by name: `git add src/modules/chat/schema.ts src/modules/chat/service.ts`
+- New (untracked), deleted, and renamed files must all be staged by explicit path.
+- **Never** use `--no-verify`.
+
+### Execution order
+
+1. Run `git status --short` and `git diff HEAD` to enumerate all changed files.
+2. Produce a written commit plan (list each commit with its files) before executing any commit.
+3. Execute commits one by one in the planned order.
+4. After all commits, print a one-line-per-commit summary with the short SHA and subject.
