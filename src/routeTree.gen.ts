@@ -13,10 +13,10 @@ import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
-import { Route as authVerifyEmailRouteImport } from './routes/(auth)/verify-email'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthedprofileProfileRouteImport } from './routes/_authed/(profile)/profile'
+import { Route as authverifyEmailVerifyEmailRouteImport } from './routes/(auth)/(verify-email)/verify-email'
 import { Route as authregisterRegisterRouteImport } from './routes/(auth)/(register)/register'
 import { Route as authloginLoginRouteImport } from './routes/(auth)/(login)/login'
 import { Route as AuthedChatlistIndexRouteImport } from './routes/_authed/chat/(list)/index'
@@ -42,11 +42,6 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
-const authVerifyEmailRoute = authVerifyEmailRouteImport.update({
-  id: '/(auth)/verify-email',
-  path: '/verify-email',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
   id: '/api/trpc/$',
   path: '/api/trpc/$',
@@ -62,6 +57,12 @@ const AuthedprofileProfileRoute = AuthedprofileProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthedRoute,
 } as any)
+const authverifyEmailVerifyEmailRoute =
+  authverifyEmailVerifyEmailRouteImport.update({
+    id: '/(auth)/(verify-email)/verify-email',
+    path: '/verify-email',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const authregisterRegisterRoute = authregisterRegisterRouteImport.update({
   id: '/(auth)/(register)/register',
   path: '/register',
@@ -91,11 +92,11 @@ const AuthedChatconversationConversationIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/verify-email': typeof authVerifyEmailRoute
   '/api/chat': typeof ApiChatRoute
   '/api/health': typeof ApiHealthRoute
   '/login': typeof authloginLoginRoute
   '/register': typeof authregisterRegisterRoute
+  '/verify-email': typeof authverifyEmailVerifyEmailRoute
   '/profile': typeof AuthedprofileProfileRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
@@ -105,11 +106,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/verify-email': typeof authVerifyEmailRoute
   '/api/chat': typeof ApiChatRoute
   '/api/health': typeof ApiHealthRoute
   '/login': typeof authloginLoginRoute
   '/register': typeof authregisterRegisterRoute
+  '/verify-email': typeof authverifyEmailVerifyEmailRoute
   '/profile': typeof AuthedprofileProfileRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
@@ -121,11 +122,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
-  '/(auth)/verify-email': typeof authVerifyEmailRoute
   '/api/chat': typeof ApiChatRoute
   '/api/health': typeof ApiHealthRoute
   '/(auth)/(login)/login': typeof authloginLoginRoute
   '/(auth)/(register)/register': typeof authregisterRegisterRoute
+  '/(auth)/(verify-email)/verify-email': typeof authverifyEmailVerifyEmailRoute
   '/_authed/(profile)/profile': typeof AuthedprofileProfileRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
@@ -137,11 +138,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/verify-email'
     | '/api/chat'
     | '/api/health'
     | '/login'
     | '/register'
+    | '/verify-email'
     | '/profile'
     | '/api/auth/$'
     | '/api/trpc/$'
@@ -151,11 +152,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/verify-email'
     | '/api/chat'
     | '/api/health'
     | '/login'
     | '/register'
+    | '/verify-email'
     | '/profile'
     | '/api/auth/$'
     | '/api/trpc/$'
@@ -166,11 +167,11 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authed'
-    | '/(auth)/verify-email'
     | '/api/chat'
     | '/api/health'
     | '/(auth)/(login)/login'
     | '/(auth)/(register)/register'
+    | '/(auth)/(verify-email)/verify-email'
     | '/_authed/(profile)/profile'
     | '/api/auth/$'
     | '/api/trpc/$'
@@ -182,11 +183,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthedRoute: typeof AuthedRouteWithChildren
-  authVerifyEmailRoute: typeof authVerifyEmailRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiHealthRoute: typeof ApiHealthRoute
   authloginLoginRoute: typeof authloginLoginRoute
   authregisterRegisterRoute: typeof authregisterRegisterRoute
+  authverifyEmailVerifyEmailRoute: typeof authverifyEmailVerifyEmailRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiTrpcSplatRoute: typeof ApiTrpcSplatRoute
 }
@@ -221,13 +222,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(auth)/verify-email': {
-      id: '/(auth)/verify-email'
-      path: '/verify-email'
-      fullPath: '/verify-email'
-      preLoaderRoute: typeof authVerifyEmailRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/trpc/$': {
       id: '/api/trpc/$'
       path: '/api/trpc/$'
@@ -248,6 +242,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/profile'
       preLoaderRoute: typeof AuthedprofileProfileRouteImport
       parentRoute: typeof AuthedRoute
+    }
+    '/(auth)/(verify-email)/verify-email': {
+      id: '/(auth)/(verify-email)/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof authverifyEmailVerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/(auth)/(register)/register': {
       id: '/(auth)/(register)/register'
@@ -308,11 +309,11 @@ const AuthedRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
-  authVerifyEmailRoute: authVerifyEmailRoute,
   ApiChatRoute: ApiChatRoute,
   ApiHealthRoute: ApiHealthRoute,
   authloginLoginRoute: authloginLoginRoute,
   authregisterRegisterRoute: authregisterRegisterRoute,
+  authverifyEmailVerifyEmailRoute: authverifyEmailVerifyEmailRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiTrpcSplatRoute: ApiTrpcSplatRoute,
 }
