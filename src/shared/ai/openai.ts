@@ -12,5 +12,5 @@ export function getChatModel() {
     baseURL: config.baseURL,
   });
 
-  return openai(config.model);
+  return openai.chat(config.model);
 }
