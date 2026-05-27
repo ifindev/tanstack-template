@@ -1,8 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type { UIMessage } from "ai";
-import { convertToModelMessages, streamText } from "ai";
+import {
+  convertToModelMessages,
+  createUIMessageStream,
+  createUIMessageStreamResponse,
+  streamText,
+} from "ai";
 import { MESSAGE_ROLE } from "@/modules/chat/constants";
-import { addMessage } from "@/modules/chat/service";
+import {
+  addMessage,
+  createConversation,
+  getConversation,
+  renameConversation,
+} from "@/modules/chat/service";
+import {
+  buildProvisionalConversationTitle,
+  generateConversationTitle,
+} from "@/modules/chat/title";
+import {
+  type ChatUiMessage,
+  CONVERSATION_CREATED_DATA_PART,
+} from "@/modules/chat/ui";
 import { isChatEnabled } from "@/shared/ai/config";
 import { getChatModel } from "@/shared/ai/openai";
 import { auth } from "@/shared/auth/better-auth";
@@ -14,6 +32,16 @@ const chatLogger = logger.child({ module: "chat-api" });
 
 function jsonError(message: string, status: number, code: string) {
   return Response.json({ code, message }, { status });
+}
+
+function getMessageText(message: UIMessage) {
+  return message.parts
+    .filter(
+      (messagePart): messagePart is { type: "text"; text: string } =>
+        messagePart.type === "text",
+    )
+    .map((messagePart) => messagePart.text)
+    .join("");
 }
 
 export const Route = createFileRoute("/api/chat")({
@@ -55,6 +83,20 @@ export async function handleChatPost(request: Request) {
     };
 
     const { messages, conversationId } = body;
+    const lastUserMessage = messages.at(-1);
+    const userPrompt =
+      lastUserMessage?.role === MESSAGE_ROLE.USER
+        ? getMessageText(lastUserMessage).trim()
+        : "";
+
+    if (!userPrompt) {
+      return jsonError(
+        "A non-empty user message is required.",
+        400,
+        "EMPTY_USER_MESSAGE",
+      );
+    }
+
     chatLogger.info({
       userId: user.id,
       conversationId,
@@ -62,18 +104,26 @@ export async function handleChatPost(request: Request) {
       event: "stream_start",
     });
 
-    // Persist the last user message before streaming.
-    const lastUserMessage = messages.at(-1);
-    if (lastUserMessage?.role === MESSAGE_ROLE.USER && conversationId) {
-      const text = lastUserMessage.parts
-        .filter(
-          (messagePart): messagePart is { type: "text"; text: string } =>
-            messagePart.type === "text",
-        )
-        .map((messagePart) => messagePart.text)
-        .join("");
-      if (text) await addMessage(conversationId, MESSAGE_ROLE.USER, text);
+    let resolvedConversationId = conversationId;
+    if (resolvedConversationId) {
+      const conversation = await getConversation(
+        user.id,
+        resolvedConversationId,
+      );
+      if (!conversation) {
+        return jsonError(
+          "Conversation not found.",
+          404,
+          "CONVERSATION_NOT_FOUND",
+        );
+      }
+    } else {
+      const provisionalTitle = buildProvisionalConversationTitle(userPrompt);
+      const conversation = await createConversation(user.id, provisionalTitle);
+      resolvedConversationId = conversation.id;
     }
+
+    await addMessage(resolvedConversationId, MESSAGE_ROLE.USER, userPrompt);
 
     const coreMessages = await convertToModelMessages(messages);
 
@@ -81,16 +131,57 @@ export async function handleChatPost(request: Request) {
       model: getChatModel(),
       messages: coreMessages,
       onFinish: async ({ text }) => {
-        if (conversationId) {
-          await addMessage(conversationId, MESSAGE_ROLE.ASSISTANT, text);
+        if (text) {
+          await addMessage(
+            resolvedConversationId,
+            MESSAGE_ROLE.ASSISTANT,
+            text,
+          );
+        }
+
+        try {
+          const generatedTitle = await generateConversationTitle(userPrompt);
+          await renameConversation(
+            user.id,
+            resolvedConversationId,
+            generatedTitle,
+          );
+        } catch (error) {
+          chatLogger.warn(
+            {
+              error,
+              conversationId: resolvedConversationId,
+              userId: user.id,
+            },
+            "Conversation title generation failed",
+          );
         }
       },
     });
 
-    return result.toUIMessageStreamResponse({
-      onError: () =>
-        "Chat provider request failed. Check AI provider configuration.",
+    result.consumeStream();
+
+    const stream = createUIMessageStream<ChatUiMessage>({
+      execute: ({ writer }) => {
+        if (!conversationId) {
+          writer.write({
+            type: CONVERSATION_CREATED_DATA_PART,
+            data: { conversationId: resolvedConversationId },
+            transient: true,
+          });
+        }
+
+        writer.merge(
+          result.toUIMessageStream({
+            originalMessages: messages as ChatUiMessage[],
+            onError: () =>
+              "Chat provider request failed. Check AI provider configuration.",
+          }),
+        );
+      },
     });
+
+    return createUIMessageStreamResponse({ stream });
   } catch (error) {
     chatLogger.error({ error }, "Chat stream failed");
     Sentry.captureException(error);
