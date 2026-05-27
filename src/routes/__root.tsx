@@ -3,7 +3,6 @@ import {
   HeadContent,
   Outlet,
   Scripts,
-  ScrollRestoration,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import type { ReactNode } from "react";
@@ -20,6 +19,7 @@ export const Route = createRootRoute({
     ],
   }),
   component: RootComponent,
+  notFoundComponent: () => <p>Page not found.</p>,
 });
 
 function RootComponent() {
@@ -54,7 +54,6 @@ gtag('config', '${import.meta.env.VITE_GA_MEASUREMENT_ID}');
       </head>
       <body className="bg-background text-foreground">
         <TooltipProvider>{children}</TooltipProvider>
-        <ScrollRestoration />
         <TanStackRouterDevtools />
         <Scripts />
       </body>

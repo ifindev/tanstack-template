@@ -1,10 +1,22 @@
+import type { AnchorHTMLAttributes } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
-import {
-  ConversationPanel,
-  getMessageText,
+import { describe, expect, it, vi } from "vitest";
+import ConversationPanel, {
   type ConversationUiMessage,
+  getMessageText,
 } from "./conversation-panel";
+
+vi.mock("@tanstack/react-router", () => ({
+  Link: ({
+    children,
+    to,
+    ...props
+  }: AnchorHTMLAttributes<HTMLAnchorElement> & { to: string }) => (
+    <a href={to} {...props}>
+      {children}
+    </a>
+  ),
+}));
 
 const messages: ConversationUiMessage[] = [
   {
@@ -61,6 +73,87 @@ describe("ConversationPanel", () => {
     expect(html).toContain("Hello! How can I help?");
     expect(html).toContain("Build me an app.");
     expect(html).not.toContain("Start chatting about anything.");
+  });
+
+  it("renders assistant markdown for inline and fenced code blocks", () => {
+    const html = renderToStaticMarkup(
+      <ConversationPanel
+        isConversationLoading={false}
+        isResponding={false}
+        messages={[
+          {
+            id: "assistant-markdown",
+            role: "assistant",
+            parts: [
+              {
+                type: "text",
+                text: "Use `sum()` here.\n\n```ts\nconst total = 1;\n```",
+              },
+            ],
+          },
+        ]}
+        title="Product shell"
+      />,
+    );
+
+    expect(html).toContain("<code");
+    expect(html).toContain("sum()");
+    expect(html).toContain("const total = 1;");
+    expect(html).toContain("Copy");
+    expect(html).not.toContain("```");
+  });
+
+  it("renders assistant markdown lists, links, and tables as elements", () => {
+    const html = renderToStaticMarkup(
+      <ConversationPanel
+        isConversationLoading={false}
+        isResponding={false}
+        messages={[
+          {
+            id: "assistant-structured",
+            role: "assistant",
+            parts: [
+              {
+                type: "text",
+                text: "- First\n- Second\n\n| Name | Value |\n| --- | --- |\n| API | Ready |\n\n[Docs](https://example.com)",
+              },
+            ],
+          },
+        ]}
+        title="Product shell"
+      />,
+    );
+
+    expect(html).toContain("<ul");
+    expect(html).toContain("<table");
+    expect(html).toContain('href="https://example.com"');
+    expect(html).toContain('target="_blank"');
+  });
+
+  it("keeps user messages as literal plain text", () => {
+    const html = renderToStaticMarkup(
+      <ConversationPanel
+        isConversationLoading={false}
+        isResponding={false}
+        messages={[
+          {
+            id: "user-markdown",
+            role: "user",
+            parts: [
+              {
+                type: "text",
+                text: "Use `sum()` here.\n\n```ts\nconst total = 1;\n```",
+              },
+            ],
+          },
+        ]}
+        title="Product shell"
+      />,
+    );
+
+    expect(html).toContain("`sum()`");
+    expect(html).toContain("```ts");
+    expect(html).not.toContain("Copy");
   });
 
   it("shows the responding UI only for live assistant generation", () => {

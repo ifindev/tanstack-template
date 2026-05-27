@@ -133,45 +133,46 @@ docker compose up --build
 ## Project Structure
 
 ```
-src/
-  modules/
-    auth/         Auth schemas, service, tRPC router
-    user/         User profile schemas, service, tRPC router
-    chat/         Conversation/message schemas, service, tRPC router
-  shared/
-    db/           Prisma client singleton
-    redis/        ioredis client
-    auth/         better-auth configuration
-    trpc/         tRPC init, context, root router
-    ai/           Vercel AI SDK / OpenAI provider
-    rate-limit/   Rate limiters (auth, chat)
-    mail/         Nodemailer transport
-    logger/       pino logger singleton
-    sentry/       Sentry server and client initialization
-  components/
-    ui/           shadcn/ui primitives (Button, Input, Card, etc.)
-    layout/       Navbar
-    chat/         Chat UI components
-  routes/
-    __root.tsx    HTML shell
-    index.tsx     Landing page
-    (auth)/       Login, register, verify-email
-    _authed.tsx   Auth guard layout
-    _authed/      Protected pages (profile, chat)
-    api/          Server-side API routes (auth, tRPC, chat stream)
-  lib/
-    utils.ts      cn() helper
-    trpc.ts       tRPC React client
-    auth-client.ts  better-auth browser client
-  test/
-    setup.ts      Vitest mocks
-  styles/
-    globals.css   Tailwind v4 CSS variables + theme
-prisma/
-  schema.prisma   Database schema
-docker/
-  Dockerfile      Multi-stage production build
-docker-compose.yml
+.
+├── src/
+│   ├── modules/
+│   │   ├── auth/             # Auth schemas, service, tRPC router
+│   │   ├── user/             # User profile schemas, service, tRPC router
+│   │   └── chat/             # Conversation/message schemas, service, tRPC router
+│   ├── shared/
+│   │   ├── db/               # Prisma client singleton
+│   │   ├── redis/            # ioredis client
+│   │   ├── auth/             # better-auth configuration
+│   │   ├── trpc/             # tRPC init, context, root router
+│   │   ├── ai/               # Vercel AI SDK / OpenAI provider
+│   │   ├── rate-limit/       # Rate limiters (auth, chat)
+│   │   ├── mail/             # Nodemailer transport
+│   │   ├── logger/           # pino logger singleton
+│   │   └── sentry/           # Sentry server and client initialization
+│   ├── components/
+│   │   ├── ui/               # shadcn/ui primitives (Button, Input, Card, etc.)
+│   │   ├── layout/           # Navbar
+│   │   └── chat/             # Chat UI components
+│   ├── routes/
+│   │   ├── __root.tsx        # HTML shell
+│   │   ├── index.tsx         # Landing page
+│   │   ├── (auth)/           # Login, register, verify-email
+│   │   ├── _authed.tsx       # Auth guard layout
+│   │   ├── _authed/          # Protected pages (profile, chat)
+│   │   └── api/              # Server-side API routes (auth, tRPC, chat stream)
+│   ├── lib/
+│   │   ├── utils.ts          # cn() helper
+│   │   ├── trpc.ts           # tRPC React client
+│   │   └── auth-client.ts    # better-auth browser client
+│   ├── test/
+│   │   └── setup.ts          # Vitest mocks
+│   └── styles/
+│       └── globals.css       # Tailwind v4 CSS variables + theme
+├── prisma/
+│   └── schema.prisma         # Database schema
+├── docker/
+│   └── Dockerfile            # Multi-stage production build
+└── docker-compose.yml
 ```
 
 ## Development Commands

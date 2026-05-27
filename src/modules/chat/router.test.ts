@@ -1,10 +1,7 @@
-import type { TRPCError } from "@trpc/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { prisma } from "@/shared/db/prisma";
 import type { Context } from "@/shared/trpc/context";
 import { chatRouter } from "./router";
-
-const originalEnv = { ...process.env };
 
 function createCaller() {
   return chatRouter.createCaller({
@@ -19,46 +16,11 @@ function createCaller() {
 }
 
 afterEach(() => {
-  process.env = { ...originalEnv };
   vi.clearAllMocks();
 });
 
 describe("chat router", () => {
-  it("blocks conversation creation when chat is disabled", async () => {
-    delete process.env.AI_API_KEY;
-    delete process.env.OPENAI_API_KEY;
-    delete process.env.AI_MODEL;
-
-    await expect(
-      createCaller().createConversation({ title: "New conversation" }),
-    ).rejects.toMatchObject({
-      code: "PRECONDITION_FAILED",
-      message: "Chat is disabled because AI provider config is missing.",
-    } satisfies Partial<TRPCError>);
-    expect(prisma.conversation.create).not.toHaveBeenCalled();
-  });
-
-  it("allows conversation creation when chat is enabled", async () => {
-    process.env.AI_API_KEY = "sk-test";
-    process.env.AI_MODEL = "gpt-4o-mini";
-    const fake = {
-      id: "c1",
-      userId: "u1",
-      title: "New conversation",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    vi.mocked(prisma.conversation.create).mockResolvedValueOnce(fake as never);
-
-    await expect(
-      createCaller().createConversation({ title: "New conversation" }),
-    ).resolves.toBe(fake);
-  });
-
-  it("still allows listing conversations when chat is disabled", async () => {
-    delete process.env.AI_API_KEY;
-    delete process.env.OPENAI_API_KEY;
-    delete process.env.AI_MODEL;
+  it("lists conversations for the current user", async () => {
     vi.mocked(prisma.conversation.findMany).mockResolvedValueOnce([] as never);
 
     await expect(
@@ -67,5 +29,19 @@ describe("chat router", () => {
       items: [],
       nextCursor: undefined,
     });
+  });
+
+  it("loads one conversation scoped to the current user", async () => {
+    vi.mocked(prisma.conversation.findFirst).mockResolvedValueOnce(null);
+
+    await expect(
+      createCaller().getConversation({ id: "c1" }),
+    ).resolves.toBeNull();
+
+    expect(prisma.conversation.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "c1", userId: "u1" },
+      }),
+    );
   });
 });

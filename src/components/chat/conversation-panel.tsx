@@ -1,11 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import type { UIMessage } from "ai";
 import { ArrowLeft, Bot, Loader2, UserRound } from "lucide-react";
 import type { ReactNode, RefObject } from "react";
+import MessageMarkdown from "@/components/chat/message-markdown";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import type { ChatUiMessage } from "@/modules/chat/ui";
 
-export type ConversationUiMessage = UIMessage;
+export type ConversationUiMessage = ChatUiMessage;
 
 type ConversationPanelProps = {
   bottomRef?: RefObject<HTMLDivElement | null>;
@@ -58,7 +59,7 @@ export function getMessageText(chatMessage: ConversationUiMessage): string {
     .join("");
 }
 
-export function ConversationPanel({
+export default function ConversationPanel({
   bottomRef,
   isConversationLoading,
   isResponding,
@@ -96,16 +97,22 @@ export function ConversationPanel({
                 </h2>
               </div>
             ) : (
-              messages.map((chatMessage) => (
-                <MessageBubble
-                  key={chatMessage.id}
-                  isUser={chatMessage.role === "user"}
-                >
-                  <p className="whitespace-pre-wrap break-words leading-7">
-                    {getMessageText(chatMessage)}
-                  </p>
-                </MessageBubble>
-              ))
+              messages.map((chatMessage) => {
+                const messageText = getMessageText(chatMessage);
+                const isUser = chatMessage.role === "user";
+
+                return (
+                  <MessageBubble key={chatMessage.id} isUser={isUser}>
+                    {isUser ? (
+                      <p className="whitespace-pre-wrap break-words leading-7">
+                        {messageText}
+                      </p>
+                    ) : (
+                      <MessageMarkdown content={messageText} />
+                    )}
+                  </MessageBubble>
+                );
+              })
             )}
 
             {isResponding && <ThinkingBubble />}

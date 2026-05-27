@@ -43,38 +43,51 @@ vi.mock("@/components/ui/tooltip", () => ({
 
 vi.mock("@/components/ui/sidebar", async () => {
   return {
-    Sidebar: ({
-      children,
-      ...props
-    }: React.HTMLAttributes<HTMLDivElement>) => <div {...props}>{children}</div>,
+    Sidebar: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+      <div {...props}>{children}</div>
+    ),
     SidebarContent: ({
       children,
       ...props
-    }: React.HTMLAttributes<HTMLDivElement>) => <div {...props}>{children}</div>,
+    }: React.HTMLAttributes<HTMLDivElement>) => (
+      <div {...props}>{children}</div>
+    ),
     SidebarFooter: ({
       children,
       ...props
-    }: React.HTMLAttributes<HTMLDivElement>) => <div {...props}>{children}</div>,
+    }: React.HTMLAttributes<HTMLDivElement>) => (
+      <div {...props}>{children}</div>
+    ),
     SidebarGroup: ({
       children,
       ...props
-    }: React.HTMLAttributes<HTMLDivElement>) => <div {...props}>{children}</div>,
+    }: React.HTMLAttributes<HTMLDivElement>) => (
+      <div {...props}>{children}</div>
+    ),
     SidebarGroupContent: ({
       children,
       ...props
-    }: React.HTMLAttributes<HTMLDivElement>) => <div {...props}>{children}</div>,
+    }: React.HTMLAttributes<HTMLDivElement>) => (
+      <div {...props}>{children}</div>
+    ),
     SidebarGroupLabel: ({
       children,
       ...props
-    }: React.HTMLAttributes<HTMLDivElement>) => <div {...props}>{children}</div>,
+    }: React.HTMLAttributes<HTMLDivElement>) => (
+      <div {...props}>{children}</div>
+    ),
     SidebarHeader: ({
       children,
       ...props
-    }: React.HTMLAttributes<HTMLDivElement>) => <div {...props}>{children}</div>,
+    }: React.HTMLAttributes<HTMLDivElement>) => (
+      <div {...props}>{children}</div>
+    ),
     SidebarMenu: ({
       children,
       ...props
-    }: React.HTMLAttributes<HTMLUListElement>) => <ul {...props}>{children}</ul>,
+    }: React.HTMLAttributes<HTMLUListElement>) => (
+      <ul {...props}>{children}</ul>
+    ),
     SidebarMenuItem: ({
       children,
       ...props
@@ -109,7 +122,13 @@ vi.mock("@/components/ui/sidebar", async () => {
     ),
     SidebarTrigger: (props: React.HTMLAttributes<HTMLButtonElement>) => (
       <button data-slot="sidebar-trigger" {...props}>
-        <span data-icon={mockUseSidebar().state === "collapsed" ? "panel-left-open" : "panel-left-close"} />
+        <span
+          data-icon={
+            mockUseSidebar().state === "collapsed"
+              ? "panel-left-open"
+              : "panel-left-close"
+          }
+        />
         <span>Toggle Sidebar</span>
       </button>
     ),
@@ -164,12 +183,12 @@ describe("AppSidebar", () => {
   it("marks collapsed labels as hidden and keeps the compact avatar sizing contract", () => {
     const html = renderSidebar("collapsed");
 
-    expect(html).toContain("group-data-[collapsible=icon]:hidden\">Chat");
-    expect(html).toContain("group-data-[collapsible=icon]:hidden\">Profile");
+    expect(html).toContain('group-data-[collapsible=icon]:hidden">Chat');
+    expect(html).toContain('group-data-[collapsible=icon]:hidden">Profile');
     expect(html).toContain(
       "grid min-w-0 flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden",
     );
-    expect(html).toContain("group-data-[collapsible=icon]:hidden\">Sign out");
+    expect(html).toContain('group-data-[collapsible=icon]:hidden">Sign out');
     expect(html).toContain("group-data-[collapsible=icon]:size-8");
   });
 
