@@ -8,16 +8,10 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
+import DeleteConversationDialog from "@/components/chat/delete-conversation-dialog";
+import RenameConversationDialog from "@/components/chat/rename-conversation-dialog";
 import { PageContainer } from "@/components/layout/editorial";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useChatListViewModel } from "./-chat.view-model";
 
@@ -229,68 +223,25 @@ function ChatListPage() {
         </div>
       </PageContainer>
 
-      <Dialog
+      <RenameConversationDialog
         open={vm.editingConversation !== null}
         onOpenChange={(open) => !open && vm.onCancelEdit()}
-      >
-        <DialogContent showCloseButton={false}>
-          <DialogHeader>
-            <DialogTitle>Edit title</DialogTitle>
-          </DialogHeader>
-          <Input
-            value={vm.editTitle}
-            onChange={(e) => vm.onEditTitleChange(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && vm.onConfirmEdit()}
-            placeholder="Conversation title"
-            autoFocus
-          />
-          <DialogFooter>
-            <Button variant="outline" onClick={vm.onCancelEdit}>
-              Cancel
-            </Button>
-            <Button
-              onClick={vm.onConfirmEdit}
-              disabled={!vm.editTitle.trim() || vm.isRenaming}
-            >
-              {vm.isRenaming ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : null}
-              Save
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        title={vm.editTitle}
+        onTitleChange={vm.onEditTitleChange}
+        onConfirm={vm.onConfirmEdit}
+        onCancel={vm.onCancelEdit}
+        isPending={vm.isRenaming}
+      />
 
-      <Dialog
+      <DeleteConversationDialog
         open={vm.pendingDelete !== null}
         onOpenChange={(open) => !open && vm.onCancelDelete()}
-      >
-        <DialogContent showCloseButton={false}>
-          <DialogHeader>
-            <DialogTitle>
-              {vm.pendingDelete?.type === "bulk"
-                ? `Delete ${vm.selectedIds.size} conversation${vm.selectedIds.size === 1 ? "" : "s"}?`
-                : "Delete conversation?"}
-            </DialogTitle>
-            <DialogDescription>This action cannot be undone.</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={vm.onCancelDelete}>
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={vm.onConfirmDelete}
-              disabled={vm.isDeleting}
-            >
-              {vm.isDeleting ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : null}
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        deleteType={vm.pendingDelete?.type ?? "single"}
+        selectedCount={vm.selectedIds.size}
+        onConfirm={vm.onConfirmDelete}
+        onCancel={vm.onCancelDelete}
+        isPending={vm.isDeleting}
+      />
     </main>
   );
 }
