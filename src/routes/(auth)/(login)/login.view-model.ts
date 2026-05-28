@@ -14,6 +14,7 @@ export function useLoginViewModel() {
   const [email, setEmail] = useState("");
   const [unverified, setUnverified] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -50,6 +51,8 @@ export function useLoginViewModel() {
     email,
     unverified,
     serverError,
+    showPassword,
+    toggleShowPassword: () => setShowPassword((v) => !v),
     register,
     handleSubmit,
     errors,
