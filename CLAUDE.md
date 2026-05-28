@@ -35,38 +35,52 @@ Optional observability vars: `SENTRY_DSN`, `VITE_SENTRY_DSN`, `VITE_GA_MEASUREME
 
 ```
 src/
-  shared/          # Singletons and infrastructure (no business logic)
-    auth/          # better-auth instance
-    db/            # Prisma client singleton
-    redis/         # ioredis client singleton
-    ai/            # Vercel AI SDK openai client
-    mail/          # Nodemailer transport + sendEmail()
-    rate-limit/    # Redis-backed rate limiters (auth, chat)
-    logger/        # pino logger singleton
-    sentry/        # Sentry server + client initialization
-    trpc/          # tRPC init, context, root router
-  modules/         # Feature modules — each owns schema, service, router, tests
-    auth/
-    user/
-    chat/
-  routes/          # TanStack file-based routes
-    __root.tsx     # HTML shell
-    index.tsx      # Landing page
-    _authed.tsx    # Auth guard layout — redirects to /login if no session
-    (auth)/        # Public auth pages (login, register, verify-email)
-    _authed/       # Protected pages (chat, profile)
-    api/           # Server-only API handlers
-      auth/$.ts    # better-auth handler
-      trpc/$.ts    # tRPC fetch handler
-      chat.ts      # AI streaming endpoint
-  components/
-    ui/            # shadcn/ui primitives (Radix-based)
-    layout/        # App-level layout components (Navbar)
-  lib/
-    trpc.ts        # createTRPCReact client
-    auth-client.ts # better-auth browser client
-  test/
-    setup.ts       # Vitest global mocks (Prisma, Redis, rate limiters)
+├── client.tsx              # Browser entry point
+├── router.tsx              # TanStack Router instance
+├── shared/                 # Singletons and infrastructure (no business logic)
+│   ├── auth/               # better-auth instance
+│   ├── db/                 # Prisma client singleton
+│   ├── redis/              # ioredis client singleton
+│   ├── ai/                 # Vercel AI SDK openai client + feature config
+│   ├── mail/               # Nodemailer transport + sendEmail()
+│   ├── rate-limit/         # Redis-backed rate limiters (auth, chat)
+│   ├── logger/             # pino logger singleton
+│   ├── sentry/             # Sentry server + client initialization
+│   └── trpc/               # tRPC init, context, root router
+├── modules/                # Feature modules — each owns schema, service, router, tests
+│   ├── auth/
+│   ├── user/
+│   ├── chat/
+│   └── config/             # Router-only module: exposes feature flags (chatEnabled) via publicProcedure
+├── hooks/                  # Sub-hooks called by ViewModel hooks
+│   ├── use-chat-session.ts  # Chat UI orchestration (useChat + scroll + tRPC)
+│   ├── use-chat-scroll.ts   # Scroll position tracking
+│   └── use-mobile.ts        # Responsive breakpoint helper
+├── routes/                 # TanStack file-based routes
+│   ├── __root.tsx          # HTML shell with GA4 + Sentry error boundary
+│   ├── index.tsx           # Public landing page
+│   ├── _authed.tsx         # Auth guard + sidebar layout (SidebarProvider + AppSidebar + SidebarInset)
+│   ├── (auth)/             # Public auth pages (login, register, verify-email)
+│   ├── _authed/            # Protected pages — each page has a view + view-model
+│   │   ├── (profile)/
+│   │   └── chat/
+│   │       ├── (list)/     # /chat — conversation list
+│   │       ├── (new)/      # /chat/new — new conversation
+│   │       └── (conversation)/ # /chat/:conversationId
+│   └── api/                # Server-only API handlers
+│       ├── auth/$.ts       # better-auth catch-all handler
+│       ├── trpc/$.ts       # tRPC fetch handler
+│       ├── chat.ts         # AI streaming endpoint (Vercel AI SDK)
+│       └── health.ts       # Health check endpoint
+├── components/
+│   ├── ui/                 # shadcn/ui primitives (Radix-based) — do not modify directly
+│   ├── layout/             # App-level layout (AppSidebar, AuthShell, Brand, Editorial, Navbar)
+│   └── chat/               # Chat feature components (ConversationPanel, ComposerArea, MessageMarkdown)
+├── lib/
+│   ├── trpc.ts             # createTRPCReact client
+│   └── auth-client.ts      # better-auth browser client
+└── test/
+    └── setup.ts            # Vitest global mocks (Prisma, Redis, rate limiters)
 ```
 
 ## Adding a Feature
@@ -77,7 +91,10 @@ Follow the module pattern used by `auth`, `user`, and `chat`:
 2. **`src/modules/<name>/service.ts`** — Pure functions that call `prisma.*`; no tRPC context
 3. **`src/modules/<name>/router.ts`** — tRPC router; use `protectedProcedure` for auth-required endpoints
 4. **`src/shared/trpc/router.ts`** — Add the new router to `appRouter`
-5. **`src/routes/_authed/<name>.tsx`** — Route that calls `trpc.<name>.*`
+5. **`src/routes/_authed/<name>/(<group>)/<name>.tsx`** — Page view (calls one ViewModel hook)
+6. **`src/routes/_authed/<name>/(<group>)/<name>.view-model.ts`** — ViewModel hook (owns all logic)
+
+For router-only modules (feature flags, no DB): skip steps 1–2, only create the router.
 
 For server-only API handlers (streaming, webhooks): `src/routes/api/<name>.ts` using `createFileRoute` with `server.handlers`.
 
@@ -110,6 +127,8 @@ vi.mocked(prisma.conversation.create).mockResolvedValueOnce(fake as never);
 
 - **Imports**: use `@/` alias (maps to `src/`), never relative paths crossing module boundaries
 - **Zod + react-hook-form**: cast schema as `any` in `zodResolver` if resolver generics drift from schema types.
+- **ViewModel pattern**: Every page has a `<name>.view-model.ts` co-located in its route group directory. The view calls one ViewModel hook and passes all values as explicit named props to components. Never put hooks, logic, or data fetching in route files or components. See `docs/guides/application-architecture.md`.
+- **Sub-hooks**: Domain hooks (e.g. `useChatSession`, `useChatScroll`) live in `src/hooks/` and are composed by ViewModel hooks — not imported directly into components or route files.
 - **Components**: All React components live under `src/components/`. Never define a reusable component inside `src/routes/` — routes are for pages only. Use `ui/` for shadcn primitives, `layout/` for app-wide layout, and `<feature>/` subdirectories (e.g., `chat/`) for feature-specific components. Each component file exports one component as a `default export` using a `function` declaration (not an arrow function). See `docs/guides/component-creation.md`.
 - **CSS**: Tailwind v4 (`@import "tailwindcss"`) — `globals.css` is excluded from Biome
 - **Biome**: 2-space indent, double quotes, trailing commas. Run `pnpm format` to auto-fix; unsafe fixes (bracket notation → dot notation) apply manually

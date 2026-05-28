@@ -135,37 +135,56 @@ docker compose up --build
 ```
 .
 ├── src/
+│   ├── client.tsx            # Browser entry point
+│   ├── router.tsx            # TanStack Router instance
 │   ├── modules/
 │   │   ├── auth/             # Auth schemas, service, tRPC router
 │   │   ├── user/             # User profile schemas, service, tRPC router
-│   │   └── chat/             # Conversation/message schemas, service, tRPC router
+│   │   ├── chat/             # Conversation/message schemas, service, tRPC router
+│   │   └── config/           # Feature flag tRPC router (router-only, no schema/service)
 │   ├── shared/
 │   │   ├── db/               # Prisma client singleton
 │   │   ├── redis/            # ioredis client
 │   │   ├── auth/             # better-auth configuration
 │   │   ├── trpc/             # tRPC init, context, root router
-│   │   ├── ai/               # Vercel AI SDK / OpenAI provider
+│   │   ├── ai/               # Vercel AI SDK / OpenAI provider + feature config
 │   │   ├── rate-limit/       # Rate limiters (auth, chat)
 │   │   ├── mail/             # Nodemailer transport
 │   │   ├── logger/           # pino logger singleton
 │   │   └── sentry/           # Sentry server and client initialization
+│   ├── hooks/
+│   │   ├── use-chat-session.ts  # Chat UI orchestration (useChat + scroll + tRPC)
+│   │   ├── use-chat-scroll.ts   # Scroll position tracking for chat
+│   │   └── use-mobile.ts        # Responsive breakpoint helper
 │   ├── components/
-│   │   ├── ui/               # shadcn/ui primitives (Button, Input, Card, etc.)
-│   │   ├── layout/           # Navbar
-│   │   └── chat/             # Chat UI components
+│   │   ├── ui/               # shadcn/ui primitives (Button, Input, Card, Sidebar, etc.)
+│   │   ├── layout/           # App-wide layout (AppSidebar, AuthShell, Brand, Editorial, Navbar)
+│   │   └── chat/             # Chat UI components (ConversationPanel, ComposerArea, MessageMarkdown)
 │   ├── routes/
-│   │   ├── __root.tsx        # HTML shell
-│   │   ├── index.tsx         # Landing page
-│   │   ├── (auth)/           # Login, register, verify-email
-│   │   ├── _authed.tsx       # Auth guard layout
-│   │   ├── _authed/          # Protected pages (profile, chat)
-│   │   └── api/              # Server-side API routes (auth, tRPC, chat stream)
+│   │   ├── __root.tsx        # HTML shell with GA4 + Sentry error boundary
+│   │   ├── index.tsx         # Public landing page
+│   │   ├── (auth)/
+│   │   │   ├── (login)/      # /login — view + view-model
+│   │   │   ├── (register)/   # /register — view + view-model
+│   │   │   └── (verify-email)/ # /verify-email — view + view-model
+│   │   ├── _authed.tsx       # Auth guard + sidebar layout (SidebarProvider + AppSidebar)
+│   │   ├── _authed/
+│   │   │   ├── (profile)/    # /profile — view + view-model
+│   │   │   └── chat/
+│   │   │       ├── (list)/   # /chat — conversation list view + view-model
+│   │   │       ├── (new)/    # /chat/new — new conversation view + view-model
+│   │   │       └── (conversation)/ # /chat/:conversationId — view + view-model
+│   │   └── api/
+│   │       ├── auth/$.ts     # better-auth catch-all handler
+│   │       ├── trpc/$.ts     # tRPC fetch handler
+│   │       ├── chat.ts       # AI streaming endpoint (Vercel AI SDK)
+│   │       └── health.ts     # Health check endpoint
 │   ├── lib/
 │   │   ├── utils.ts          # cn() helper
 │   │   ├── trpc.ts           # tRPC React client
 │   │   └── auth-client.ts    # better-auth browser client
 │   ├── test/
-│   │   └── setup.ts          # Vitest mocks
+│   │   └── setup.ts          # Vitest mocks (Prisma, Redis, rate limiters)
 │   └── styles/
 │       └── globals.css       # Tailwind v4 CSS variables + theme
 ├── prisma/
@@ -199,9 +218,11 @@ pnpm db:deploy     # Deploy migrations (production)
 
 ## AI Chat
 
+- Three chat routes: `/chat` (conversation list), `/chat/new` (new conversation), `/chat/:conversationId` (existing conversation)
 - Conversations are stored in Postgres (`Conversation` + `Message` tables)
 - Messages are streamed from `/api/chat` using the Vercel AI SDK data stream protocol
 - Rate limiting: 20 requests per minute per user (Redis-backed in production, Memory in tests)
+- All chat pages follow the ViewModel pattern — logic lives in `*.view-model.ts` hooks, views pass props to pure components
 
 ## Deployment
 

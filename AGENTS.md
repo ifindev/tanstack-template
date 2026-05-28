@@ -24,33 +24,39 @@ Architectural reference for AI coding agents working in this codebase.
 
 ```
 src/
-  shared/        Infrastructure singletons — import from here, never instantiate elsewhere
-    logger/      pino singleton; use logger.child({ module }) per feature
-    sentry/      Sentry server and client init files
-  modules/       Feature modules — each is self-contained (schema + service + router + tests)
-  routes/        File-based routes (TanStack Router convention)
-  components/    React components
-    ui/          shadcn/ui primitives — do not modify these directly
-    layout/      App-wide layout components
-  lib/           Thin client wrappers (tRPC client, auth client)
-  test/          Shared Vitest setup only (global mocks)
+├── client.tsx   # Browser entry point
+├── router.tsx   # TanStack Router instance
+├── shared/      # Infrastructure singletons — import from here, never instantiate elsewhere
+│   ├── logger/  # pino singleton; use logger.child({ module }) per feature
+│   └── sentry/  # Sentry server and client init files
+├── modules/     # Feature modules — each is self-contained (schema + service + router + tests)
+├── hooks/       # Sub-hooks called by ViewModel hooks (use-chat-session, use-chat-scroll, use-mobile)
+├── routes/      # File-based routes (TanStack Router convention)
+├── components/  # React components
+│   ├── ui/      # shadcn/ui primitives — do not modify these directly
+│   ├── layout/  # App-wide layout components (AppSidebar, AuthShell, Brand, Editorial, Navbar)
+│   └── chat/    # Chat feature components (ConversationPanel, ComposerArea, MessageMarkdown)
+├── lib/         # Thin client wrappers (tRPC client, auth client)
+└── test/        # Shared Vitest setup only (global mocks)
 ```
 
 ## Module Pattern
 
-Every feature follows the same four-file structure:
+Most features follow the same four-file structure:
 
 ```
 src/modules/<feature>/
-  schema.ts    Zod schemas for all inputs
-  service.ts   Pure async functions — takes primitives, calls prisma.*, returns data
-  router.ts    tRPC router — calls service functions, handles tRPC errors
-  *.test.ts    Tests co-located with the file they test
+├── schema.ts   # Zod schemas for all inputs
+├── service.ts  # Pure async functions — takes primitives, calls prisma.*, returns data
+├── router.ts   # tRPC router — calls service functions, handles tRPC errors
+└── *.test.ts   # Tests co-located with the file they test
 ```
 
 **Service functions** must not reference tRPC context or HTTP. They take plain arguments (`userId: string`, etc.) and return plain data. This makes them independently testable.
 
 **Routers** extract `ctx.user.id` and validated `input`, then call the service. They own error mapping to `TRPCError`.
+
+**Router-only modules** (e.g. `config`) have no schema or service — they expose simple computed values directly in the router (e.g. feature flags from env vars).
 
 To wire a new module: add its router to `src/shared/trpc/router.ts`:
 ```ts
@@ -58,6 +64,7 @@ export const appRouter = router({
   auth: authRouter,
   user: userRouter,
   chat: chatRouter,
+  config: configRouter,
   myFeature: myFeatureRouter,  // add here
 });
 ```
@@ -85,14 +92,18 @@ File-based routing via TanStack Router:
 
 | Pattern | Purpose |
 |---------|---------|
-| `__root.tsx` | HTML shell with `<Scripts />`, `<ScrollRestoration />` |
+| `__root.tsx` | HTML shell with `<Scripts />`, `<ScrollRestoration />`, GA4, Sentry |
 | `index.tsx` | Public landing page |
-| `_authed.tsx` | Layout that enforces auth; all children are protected |
-| `_authed/<page>.tsx` | Protected pages — use `trpc.*` for data |
+| `_authed.tsx` | Auth guard + sidebar layout (`SidebarProvider + AppSidebar + SidebarInset`); all children are protected |
+| `_authed/<feature>/(group)/` | Pathless route group — scopes view and view-model files without adding URL segments |
+| `_authed/<page>.tsx` | Protected page view — calls one ViewModel hook, passes props to components |
+| `<page>.view-model.ts` | ViewModel hook co-located with its route file; owns all logic, hooks, and handlers |
 | `(auth)/<page>.tsx` | Public auth pages (parentheses = pathless group) |
 | `api/<name>.ts` | Server-only handlers (no React component) |
 
-Protected routes sit under `src/routes/_authed/`. The `_authed.tsx` layout runs `getServerSession()` in `beforeLoad` and redirects to `/login` if there's no session.
+Protected routes sit under `src/routes/_authed/`. The `_authed.tsx` layout runs `getServerSession()` in `beforeLoad` and redirects to `/login` if there's no session. It also renders the application sidebar common to all authenticated pages.
+
+Every page follows a three-layer ViewModel pattern — see `docs/guides/application-architecture.md`.
 
 API routes use `server.handlers`:
 ```ts
