@@ -89,9 +89,11 @@ Commit Plan:
   #4  chore(routes)  src/routeTree.gen.ts
 ```
 
-Wait for acknowledgement or proceed if the user has already given blanket approval.
+Do not proceed on blanket approval alone. The workflow must pause here and wait for the user to explicitly confirm the proposed commit plan, because the user may want a more or less atomic grouping than the default plan.
 
 ## Step 4 — Execute commits in order
+
+Only begin this step after the user explicitly confirms the commit plan.
 
 For each planned commit:
 
