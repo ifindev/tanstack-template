@@ -9,7 +9,8 @@ import type { ChatUiMessage } from "@/modules/chat/ui";
 export type ConversationUiMessage = ChatUiMessage;
 
 type ConversationPanelProps = {
-  bottomRef?: RefObject<HTMLDivElement | null>;
+  contentRef?: RefObject<HTMLDivElement | null>;
+  viewportRef?: RefObject<HTMLDivElement | null>;
   isConversationLoading: boolean;
   isResponding: boolean;
   messages: ConversationUiMessage[];
@@ -60,7 +61,8 @@ export function getMessageText(chatMessage: ConversationUiMessage): string {
 }
 
 export default function ConversationPanel({
-  bottomRef,
+  contentRef,
+  viewportRef,
   isConversationLoading,
   isResponding,
   messages,
@@ -86,8 +88,11 @@ export default function ConversationPanel({
       </div>
 
       <div className="min-h-0 flex-1 overflow-hidden">
-        <ScrollArea className="h-full">
-          <div className="space-y-4 px-4 py-5 pb-8 sm:px-5 sm:pb-10">
+        <ScrollArea className="h-full" viewportRef={viewportRef}>
+          <div
+            ref={contentRef}
+            className="space-y-4 px-4 py-5 pb-8 sm:px-5 sm:pb-10"
+          >
             {isConversationLoading ? (
               <ConversationSkeletonList />
             ) : messages.length === 0 ? (
@@ -116,7 +121,6 @@ export default function ConversationPanel({
             )}
 
             {isResponding && <ThinkingBubble />}
-            <div ref={bottomRef} />
           </div>
         </ScrollArea>
       </div>
