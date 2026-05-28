@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRegisterViewModel } from "./register.view-model";
+import { useRegisterViewModel } from "./-register.view-model";
 
 export const Route = createFileRoute("/(auth)/(register)/register")({
   component: RegisterPage,
