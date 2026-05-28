@@ -46,6 +46,10 @@ export async function deleteConversation(userId: string, id: string) {
   return prisma.conversation.deleteMany({ where: { id, userId } });
 }
 
+export async function deleteConversations(userId: string, ids: string[]) {
+  return prisma.conversation.deleteMany({ where: { id: { in: ids }, userId } });
+}
+
 export async function addMessage(
   conversationId: string,
   role: MessageRole,
