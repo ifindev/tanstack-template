@@ -3,7 +3,7 @@
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { useConversationViewModel } from "./$conversationId.view-model";
+import { useConversationViewModel } from "./-$conversationId.view-model";
 
 const mockUseParams = vi.fn();
 const mockUseQuery = vi.fn();
