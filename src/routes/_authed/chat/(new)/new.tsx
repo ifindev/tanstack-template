@@ -17,7 +17,8 @@ function NewConversationPage() {
         <PageContainer className="flex h-full min-h-0 flex-col py-6 sm:py-8">
           <div className="mx-auto flex w-full max-w-3xl min-h-0 flex-1 flex-col">
             <ConversationPanel
-              bottomRef={vm.scroll.bottomRef}
+              contentRef={vm.scroll.contentRef}
+              viewportRef={vm.scroll.viewportRef}
               isConversationLoading={false}
               isResponding={vm.chatSession.isResponding}
               messages={vm.chatSession.messages}
@@ -32,8 +33,8 @@ function NewConversationPage() {
         isAtBottom={vm.scroll.isAtBottom}
         chatError={vm.chatSession.chatError}
         composerDisabled={vm.chatSession.composerDisabled}
+        canSubmit={vm.chatSession.canSubmit}
         chatEnabled={vm.chatSession.chatEnabled}
-        bottomRef={vm.scroll.bottomRef}
         isLoadingFeatures={vm.chatSession.isLoadingFeatures}
         onInputChange={vm.chatSession.onInputChange}
         onSubmit={vm.chatSession.onSubmit}
