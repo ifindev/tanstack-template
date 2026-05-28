@@ -1,6 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { formatDistanceToNow } from "date-fns";
-import { AlertCircle, Loader2, MessageSquarePlus, Search } from "lucide-react";
+import {
+  AlertCircle,
+  Loader2,
+  MessageSquarePlus,
+  Pencil,
+  Search,
+  Trash2,
+} from "lucide-react";
+import DeleteConversationDialog from "@/components/chat/delete-conversation-dialog";
+import RenameConversationDialog from "@/components/chat/rename-conversation-dialog";
 import { PageContainer } from "@/components/layout/editorial";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +29,7 @@ function ChatListPage() {
   const vm = useChatListViewModel();
 
   return (
-    <main className="flex-1 py-6 sm:py-8">
+    <main className="flex-1 overflow-y-auto py-6 sm:py-8">
       <PageContainer className="max-w-6xl space-y-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2">
@@ -30,12 +39,16 @@ function ChatListPage() {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button variant="outline" className="w-full sm:w-auto">
-              Select chats
+            <Button
+              variant="outline"
+              className="w-full sm:w-auto"
+              onClick={vm.onToggleSelectMode}
+            >
+              {vm.selectMode ? "Cancel" : "Select chats"}
             </Button>
             <Button
               onClick={vm.onNavigateNew}
-              disabled={!vm.chatEnabled || vm.isLoadingFeatures}
+              disabled={!vm.chatEnabled || vm.isLoadingFeatures || vm.selectMode}
               className="w-full sm:w-auto"
             >
               <MessageSquarePlus className="size-4" />
@@ -56,7 +69,7 @@ function ChatListPage() {
           </div>
         )}
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div className="relative">
             <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -66,6 +79,46 @@ function ChatListPage() {
               className="h-10 rounded-xl bg-background pr-4 pl-10 text-sm"
             />
           </div>
+
+          {vm.selectMode && vm.selectedIds.size > 0 && (
+            <div className="flex items-center justify-between rounded-xl border border-border bg-surface-soft px-4 py-2.5">
+              <span className="text-sm text-muted-foreground">
+                {vm.selectedIds.size} selected
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={vm.onDeselectAll}
+                >
+                  Deselect all
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={vm.onRequestBulkDelete}
+                >
+                  <Trash2 className="size-3.5" />
+                  Delete selected
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {vm.selectMode && vm.filteredItems.length > 0 && vm.selectedIds.size === 0 && (
+            <div className="flex items-center justify-between rounded-xl border border-border bg-surface-soft px-4 py-2.5">
+              <span className="text-sm text-muted-foreground">
+                Select conversations to delete
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={vm.onSelectAll}
+              >
+                Select all
+              </Button>
+            </div>
+          )}
 
           {vm.isLoading && (
             <div className="flex items-center gap-2 px-1 py-10 text-sm text-muted-foreground">
@@ -99,11 +152,26 @@ function ChatListPage() {
 
           <ul className="divide-y divide-border/80">
             {vm.filteredItems.map((conv: ConversationListItem) => (
-              <li key={conv.id}>
+              <li key={conv.id} className="group flex items-center">
+                {vm.selectMode && (
+                  <label className="flex shrink-0 cursor-pointer items-center pl-1 pr-3 py-6">
+                    <input
+                      type="checkbox"
+                      checked={vm.selectedIds.has(conv.id)}
+                      onChange={() => vm.onToggleSelect(conv.id)}
+                      className="size-4 cursor-pointer rounded border-border accent-primary"
+                    />
+                    <span className="sr-only">Select {conv.title}</span>
+                  </label>
+                )}
                 <button
                   type="button"
-                  onClick={() => vm.onNavigateConversation(conv.id)}
-                  className="w-full bg-transparent px-5 py-6 text-left focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/15"
+                  onClick={() =>
+                    vm.selectMode
+                      ? vm.onToggleSelect(conv.id)
+                      : vm.onNavigateConversation(conv.id)
+                  }
+                  className="min-w-0 flex-1 bg-transparent px-5 py-6 text-left focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/15"
                 >
                   <div className="flex items-center justify-between gap-6">
                     <span className="min-w-0 flex-1">
@@ -123,11 +191,57 @@ function ChatListPage() {
                     </span>
                   </div>
                 </button>
+                {!vm.selectMode && (
+                  <div className="flex shrink-0 items-center gap-1 pr-2 opacity-0 transition-opacity group-hover:opacity-100">
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        vm.onStartEdit(conv.id, conv.title);
+                      }}
+                    >
+                      <Pencil className="size-4" />
+                      <span className="sr-only">Edit title</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        vm.onRequestDelete(conv.id);
+                      }}
+                    >
+                      <Trash2 className="size-4" />
+                      <span className="sr-only">Delete</span>
+                    </Button>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
         </div>
       </PageContainer>
+
+      <RenameConversationDialog
+        open={vm.editingConversation !== null}
+        onOpenChange={(open) => !open && vm.onCancelEdit()}
+        title={vm.editTitle}
+        onTitleChange={vm.onEditTitleChange}
+        onConfirm={vm.onConfirmEdit}
+        onCancel={vm.onCancelEdit}
+        isPending={vm.isRenaming}
+      />
+
+      <DeleteConversationDialog
+        open={vm.pendingDelete !== null}
+        onOpenChange={(open) => !open && vm.onCancelDelete()}
+        deleteType={vm.pendingDelete?.type ?? "single"}
+        selectedCount={vm.selectedIds.size}
+        onConfirm={vm.onConfirmDelete}
+        onCancel={vm.onCancelDelete}
+        isPending={vm.isDeleting}
+      />
     </main>
   );
 }

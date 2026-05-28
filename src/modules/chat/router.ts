@@ -1,5 +1,6 @@
 import { protectedProcedure, router } from "@/shared/trpc/init";
 import {
+  bulkDeleteConversationsSchema,
   deleteConversationSchema,
   getConversationSchema,
   listConversationsSchema,
@@ -7,6 +8,7 @@ import {
 } from "./schema";
 import {
   deleteConversation,
+  deleteConversations,
   getConversationWithMessages,
   listConversations,
   renameConversation,
@@ -42,6 +44,13 @@ export const chatRouter = router({
     .input(deleteConversationSchema)
     .mutation(async ({ ctx, input }) => {
       await deleteConversation(ctx.user.id, input.id);
+      return { success: true };
+    }),
+
+  deleteConversations: protectedProcedure
+    .input(bulkDeleteConversationsSchema)
+    .mutation(async ({ ctx, input }) => {
+      await deleteConversations(ctx.user.id, input.ids);
       return { success: true };
     }),
 });

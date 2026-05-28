@@ -18,3 +18,7 @@ export const listConversationsSchema = z.object({
   cursor: z.string().optional(),
   limit: z.number().min(1).max(50).default(20),
 });
+
+export const bulkDeleteConversationsSchema = z.object({
+  ids: z.array(z.string()).min(1),
+});
