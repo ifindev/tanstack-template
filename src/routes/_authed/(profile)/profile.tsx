@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useProfileViewModel } from "./profile.view-model";
+import { useProfileViewModel } from "./-profile.view-model";
 
 export const Route = createFileRoute("/_authed/(profile)/profile")({
   component: ProfilePage,
