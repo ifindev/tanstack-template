@@ -1,6 +1,6 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   type ChatUiMessage,
   CONVERSATION_CREATED_DATA_PART,
@@ -34,7 +34,7 @@ export function useChatSession({
   const [chatError, setChatError] = useState<string | null>(null);
   const chatEnabled = features?.chatEnabled ?? false;
 
-  const { messages, sendMessage, status } = useChat<ChatUiMessage>({
+  const { messages, sendMessage, status, setMessages } = useChat<ChatUiMessage>({
     transport: new DefaultChatTransport({
       api: "/api/chat",
       body: conversationId ? { conversationId } : undefined,
@@ -53,9 +53,22 @@ export function useChatSession({
     },
   });
 
+  // useChat reads `messages` prop only at mount. For existing conversations the
+  // tRPC query resolves after mount, so we hydrate the store once when the first
+  // non-empty initialMessages arrives. The ref prevents re-hydration on refetches
+  // or during/after streaming.
+  const hasHydratedRef = useRef(initialMessages.length > 0);
+  useEffect(() => {
+    if (!hasHydratedRef.current && initialMessages.length > 0) {
+      setMessages(initialMessages);
+      hasHydratedRef.current = true;
+    }
+  }, [initialMessages, setMessages]);
+
   const isResponding = status === "streaming" || status === "submitted";
   const composerDisabled =
     isLoadingFeatures || !chatEnabled || isResponding || isConversationLoading;
+  const canSubmit = input.trim().length > 0 && !composerDisabled;
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(event.target.value);
@@ -63,7 +76,7 @@ export function useChatSession({
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (!input.trim() || composerDisabled) return;
+    if (!canSubmit) return;
 
     setChatError(null);
     sendMessage({ text: input });
@@ -76,6 +89,7 @@ export function useChatSession({
     chatError,
     isResponding,
     composerDisabled,
+    canSubmit,
     chatEnabled,
     isLoadingFeatures,
     onInputChange: handleInputChange,
