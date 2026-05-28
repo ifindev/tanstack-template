@@ -1,6 +1,6 @@
 # TanStack Start Full-Stack Template
 
-A production-ready full-stack template using TanStack Start, tRPC v11, better-auth, Prisma, Redis, and the Vercel AI SDK.
+A production-ready full-stack template using TanStack Start, tRPC v11, better-auth, PostgreSQL (Prisma), Redis, and the Vercel AI SDK.
 
 ## Stack
 
