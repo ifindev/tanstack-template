@@ -213,6 +213,7 @@ Detailed architectural references in `docs/guides/`. Consult these when the rele
 
 | Guide | When to read |
 |-------|-------------|
+| **`docs/guides/application-architecture.md`** | **START HERE** when building new pages: three-layer ViewModel pattern (Route Views, ViewModel hooks, Pure components) |
 | `docs/guides/environment-setup.md` | Setting up the project for the first time, configuring env vars, or understanding local infrastructure |
 | `docs/guides/observability.md` | Working with pino logging, Sentry error tracking, or the health endpoint |
 | `docs/guides/analytics.md` | Configuring GA4 or changing analytics script injection |

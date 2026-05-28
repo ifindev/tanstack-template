@@ -1,9 +1,5 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AlertCircle, Loader2, MailCheck } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import type { z } from "zod";
 import { AuthShell } from "@/components/layout/auth-shell";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,37 +11,16 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { trpc } from "@/lib/trpc";
-import { registerSchema } from "@/modules/auth/schema";
+import { useRegisterViewModel } from "./register.view-model";
 
-export const Route = createFileRoute("/(auth)/register")({
+export const Route = createFileRoute("/(auth)/(register)/register")({
   component: RegisterPage,
 });
 
-type FormData = z.infer<typeof registerSchema>;
-
 function RegisterPage() {
-  const [success, setSuccess] = useState(false);
-  const [serverError, setServerError] = useState<string | null>(null);
+  const vm = useRegisterViewModel();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    // biome-ignore lint/suspicious/noExplicitAny: zod v3/v4 type bridge
-  } = useForm<FormData>({ resolver: zodResolver(registerSchema as any) });
-
-  const registerMutation = trpc.auth.register.useMutation({
-    onSuccess: () => setSuccess(true),
-    onError: (err) => setServerError(err.message),
-  });
-
-  const onSubmit = (data: FormData) => {
-    setServerError(null);
-    registerMutation.mutate(data);
-  };
-
-  if (success) {
+  if (vm.success) {
     return (
       <AuthShell>
         <Card className="bg-background">
@@ -79,17 +54,17 @@ function RegisterPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={vm.handleSubmit(vm.onSubmit)} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
-                aria-invalid={!!errors.name}
-                {...register("name")}
+                aria-invalid={!!vm.errors.name}
+                {...vm.register("name")}
               />
-              {errors.name && (
+              {vm.errors.name && (
                 <p className="text-sm text-destructive">
-                  {errors.name.message}
+                  {vm.errors.name.message}
                 </p>
               )}
             </div>
@@ -99,12 +74,12 @@ function RegisterPage() {
               <Input
                 id="email"
                 type="email"
-                aria-invalid={!!errors.email}
-                {...register("email")}
+                aria-invalid={!!vm.errors.email}
+                {...vm.register("email")}
               />
-              {errors.email && (
+              {vm.errors.email && (
                 <p className="text-sm text-destructive">
-                  {errors.email.message}
+                  {vm.errors.email.message}
                 </p>
               )}
             </div>
@@ -114,28 +89,28 @@ function RegisterPage() {
               <Input
                 id="password"
                 type="password"
-                aria-invalid={!!errors.password}
-                {...register("password")}
+                aria-invalid={!!vm.errors.password}
+                {...vm.register("password")}
               />
-              {errors.password && (
+              {vm.errors.password && (
                 <p className="text-sm text-destructive">
-                  {errors.password.message}
+                  {vm.errors.password.message}
                 </p>
               )}
             </div>
 
-            {serverError && (
+            {vm.serverError && (
               <div className="flex gap-3 rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">
                 <AlertCircle className="mt-0.5 size-4 shrink-0" />
-                <p>{serverError}</p>
+                <p>{vm.serverError}</p>
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? (
+            <Button type="submit" className="w-full" disabled={vm.isSubmitting}>
+              {vm.isSubmitting ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : null}
-              {isSubmitting ? "Creating account..." : "Create account"}
+              {vm.isSubmitting ? "Creating account..." : "Create account"}
             </Button>
 
             <p className="text-center text-sm text-muted-foreground">

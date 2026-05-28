@@ -139,22 +139,24 @@ export async function handleChatPost(request: Request) {
           );
         }
 
-        try {
-          const generatedTitle = await generateConversationTitle(userPrompt);
-          await renameConversation(
-            user.id,
-            resolvedConversationId,
-            generatedTitle,
-          );
-        } catch (error) {
-          chatLogger.warn(
-            {
-              error,
-              conversationId: resolvedConversationId,
-              userId: user.id,
-            },
-            "Conversation title generation failed",
-          );
+        if (!conversationId) {
+          try {
+            const generatedTitle = await generateConversationTitle(userPrompt);
+            await renameConversation(
+              user.id,
+              resolvedConversationId,
+              generatedTitle,
+            );
+          } catch (error) {
+            chatLogger.warn(
+              {
+                error,
+                conversationId: resolvedConversationId,
+                userId: user.id,
+              },
+              "Conversation title generation failed",
+            );
+          }
         }
       },
     });

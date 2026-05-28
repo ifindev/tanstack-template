@@ -48,7 +48,18 @@ type MarkdownCodeProps = ComponentProps<"code"> &
     node?: unknown;
   };
 
+type MarkdownHeadingProps = ComponentProps<"h1"> &
+  MarkdownDataAttributes & {
+    children?: ReactNode;
+    node?: unknown;
+  };
+
+type MarkdownHeadingTag = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+
 type BlockCodeElement = ReactElement<MarkdownCodeProps>;
+
+const markdownHeadingInlineCodeStyles =
+  "[&_code]:rounded-md [&_code]:bg-surface-soft [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.78em] [&_code]:font-medium [&_code]:tracking-normal [&_code]:text-inherit [&_code]:whitespace-nowrap";
 
 const prettyCodeOptions = {
   theme: "github-light",
@@ -287,6 +298,73 @@ function MarkdownCode({
   );
 }
 
+function createMarkdownHeading(tagName: MarkdownHeadingTag, styles: string) {
+  function MarkdownHeading({
+    children,
+    className,
+    node: _node,
+    ...props
+  }: MarkdownHeadingProps) {
+    const Tag = tagName;
+
+    return (
+      <Tag {...props} className={cn(styles, className)}>
+        {children}
+      </Tag>
+    );
+  }
+
+  return MarkdownHeading;
+}
+
+const MarkdownHeadingOne = createMarkdownHeading(
+  "h1",
+  cn(
+    "my-6 font-heading text-[1.75rem] font-semibold tracking-[-0.04em] text-foreground",
+    markdownHeadingInlineCodeStyles,
+  ),
+);
+
+const MarkdownHeadingTwo = createMarkdownHeading(
+  "h2",
+  cn(
+    "my-5 font-heading text-[1.4rem] font-semibold tracking-[-0.03em] text-foreground",
+    markdownHeadingInlineCodeStyles,
+  ),
+);
+
+const MarkdownHeadingThree = createMarkdownHeading(
+  "h3",
+  cn(
+    "my-5 font-heading text-[1.15rem] font-semibold tracking-[-0.03em] text-foreground",
+    markdownHeadingInlineCodeStyles,
+  ),
+);
+
+const MarkdownHeadingFour = createMarkdownHeading(
+  "h4",
+  cn(
+    "my-4 font-heading text-base font-semibold tracking-[-0.02em] text-foreground",
+    markdownHeadingInlineCodeStyles,
+  ),
+);
+
+const MarkdownHeadingFive = createMarkdownHeading(
+  "h5",
+  cn(
+    "my-4 font-heading text-[0.9375rem] font-semibold tracking-[-0.02em] text-foreground",
+    markdownHeadingInlineCodeStyles,
+  ),
+);
+
+const MarkdownHeadingSix = createMarkdownHeading(
+  "h6",
+  cn(
+    "my-4 font-heading text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-foreground",
+    markdownHeadingInlineCodeStyles,
+  ),
+);
+
 export const assistantMarkdownComponents: Components = {
   a: ({ children, href, ...props }) => (
     <a
@@ -307,6 +385,12 @@ export const assistantMarkdownComponents: Components = {
   code: MarkdownCode,
   em: ({ children }) => <em className="italic">{children}</em>,
   figure: MarkdownFigure,
+  h1: MarkdownHeadingOne,
+  h2: MarkdownHeadingTwo,
+  h3: MarkdownHeadingThree,
+  h4: MarkdownHeadingFour,
+  h5: MarkdownHeadingFive,
+  h6: MarkdownHeadingSix,
   li: ({ children }) => <li className="pl-1 leading-7">{children}</li>,
   ol: ({ children }) => (
     <ol className="my-4 list-decimal space-y-2 pl-6">{children}</ol>

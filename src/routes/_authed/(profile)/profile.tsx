@@ -1,9 +1,5 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle2, Loader2, UserRound } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import type { z } from "zod";
 import { PageContainer, SurfacePanel } from "@/components/layout/editorial";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,37 +11,14 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { trpc } from "@/lib/trpc";
-import { updateProfileSchema } from "@/modules/user/schema";
+import { useProfileViewModel } from "./profile.view-model";
 
-export const Route = createFileRoute("/_authed/profile")({
+export const Route = createFileRoute("/_authed/(profile)/profile")({
   component: ProfilePage,
 });
 
-type FormData = z.infer<typeof updateProfileSchema>;
-
 function ProfilePage() {
-  const { data: user } = trpc.user.me.useQuery();
-  const [success, setSuccess] = useState(false);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<FormData>({
-    // biome-ignore lint/suspicious/noExplicitAny: zod v3/v4 type bridge
-    resolver: zodResolver(updateProfileSchema as any),
-    values: user ? { name: user.name } : undefined,
-  });
-
-  const updateMutation = trpc.user.updateProfile.useMutation({
-    onSuccess: () => setSuccess(true),
-  });
-
-  const onSubmit = (data: FormData) => {
-    setSuccess(false);
-    updateMutation.mutate(data);
-  };
+  const vm = useProfileViewModel();
 
   return (
     <main className="flex-1 py-8 sm:py-10">
@@ -69,10 +42,10 @@ function ProfilePage() {
               </span>
               <div className="min-w-0">
                 <p className="truncate font-heading text-xl font-semibold tracking-[-0.03em] text-foreground">
-                  {user?.name ?? "Account"}
+                  {vm.user?.name ?? "Account"}
                 </p>
                 <p className="truncate text-sm text-muted-foreground">
-                  {user?.email ?? "Loading..."}
+                  {vm.user?.email ?? "Loading..."}
                 </p>
               </div>
             </div>
@@ -97,18 +70,21 @@ function ProfilePage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <form
+                onSubmit={vm.handleSubmit(vm.onSubmit)}
+                className="space-y-6"
+              >
                 <div className="space-y-2">
                   <Label htmlFor="name">Name</Label>
-                  <Input id="name" {...register("name")} />
-                  {errors.name && (
+                  <Input id="name" {...vm.register("name")} />
+                  {vm.errors.name && (
                     <p className="text-sm text-destructive">
-                      {errors.name.message}
+                      {vm.errors.name.message}
                     </p>
                   )}
                 </div>
 
-                {success && (
+                {vm.success && (
                   <div className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/10 p-4 text-sm text-body-strong">
                     <CheckCircle2 className="size-4 text-primary" />
                     Profile updated successfully.
@@ -117,12 +93,12 @@ function ProfilePage() {
 
                 <Button
                   type="submit"
-                  disabled={isSubmitting || updateMutation.isPending}
+                  disabled={vm.isSubmitting || vm.updateMutation.isPending}
                 >
-                  {isSubmitting || updateMutation.isPending ? (
+                  {vm.isSubmitting || vm.updateMutation.isPending ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : null}
-                  {isSubmitting || updateMutation.isPending
+                  {vm.isSubmitting || vm.updateMutation.isPending
                     ? "Saving changes..."
                     : "Save changes"}
                 </Button>

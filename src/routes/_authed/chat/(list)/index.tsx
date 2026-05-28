@@ -1,11 +1,10 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { formatDistanceToNow } from "date-fns";
 import { AlertCircle, Loader2, MessageSquarePlus, Search } from "lucide-react";
-import { useMemo, useState } from "react";
 import { PageContainer } from "@/components/layout/editorial";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { trpc } from "@/lib/trpc";
+import { useChatListViewModel } from "./chat.view-model";
 
 type ConversationListItem = {
   id: string;
@@ -13,27 +12,13 @@ type ConversationListItem = {
   updatedAt: string | Date;
 };
 
-export const Route = createFileRoute("/_authed/chat/")({
+export const Route = createFileRoute("/_authed/chat/(list)/")({
   component: ChatListPage,
 });
 
 function ChatListPage() {
-  const navigate = useNavigate();
-  const [query, setQuery] = useState("");
-  const { data: features, isLoading: isLoadingFeatures } =
-    trpc.config.features.useQuery();
-  const { data, isLoading } = trpc.chat.listConversations.useQuery({
-    limit: 20,
-  });
-  const chatEnabled = features?.chatEnabled ?? false;
-  const filteredItems = useMemo(() => {
-    const items = data?.items ?? [];
-    const normalizedQuery = query.trim().toLowerCase();
-    if (!normalizedQuery) return items;
-    return items.filter((item: ConversationListItem) =>
-      item.title.toLowerCase().includes(normalizedQuery),
-    );
-  }, [data?.items, query]);
+  const vm = useChatListViewModel();
+
   return (
     <main className="flex-1 py-6 sm:py-8">
       <PageContainer className="max-w-6xl space-y-8">
@@ -49,8 +34,8 @@ function ChatListPage() {
               Select chats
             </Button>
             <Button
-              onClick={() => navigate({ to: "/chat/new" })}
-              disabled={!chatEnabled || isLoadingFeatures}
+              onClick={vm.onNavigateNew}
+              disabled={!vm.chatEnabled || vm.isLoadingFeatures}
               className="w-full sm:w-auto"
             >
               <MessageSquarePlus className="size-4" />
@@ -59,7 +44,7 @@ function ChatListPage() {
           </div>
         </div>
 
-        {!isLoadingFeatures && !chatEnabled && (
+        {!vm.isLoadingFeatures && !vm.chatEnabled && (
           <div className="flex gap-3 rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">
             <AlertCircle className="mt-0.5 size-4 shrink-0" />
             <div>
@@ -75,21 +60,21 @@ function ChatListPage() {
           <div className="relative">
             <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              value={vm.query}
+              onChange={(event) => vm.onQueryChange(event.target.value)}
               placeholder="Search chats..."
               className="h-10 rounded-xl bg-background pr-4 pl-10 text-sm"
             />
           </div>
 
-          {isLoading && (
+          {vm.isLoading && (
             <div className="flex items-center gap-2 px-1 py-10 text-sm text-muted-foreground">
               <Loader2 className="size-4 animate-spin" />
               Loading conversations...
             </div>
           )}
 
-          {!isLoading && data?.items.length === 0 && (
+          {!vm.isLoading && vm.data?.items.length === 0 && (
             <div className="rounded-xl border border-dashed border-border bg-background px-6 py-14 text-center">
               <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-surface-soft">
                 <MessageSquarePlus className="size-5 text-primary" />
@@ -103,26 +88,21 @@ function ChatListPage() {
             </div>
           )}
 
-          {!isLoading &&
-            data &&
-            data.items.length > 0 &&
-            filteredItems.length === 0 && (
+          {!vm.isLoading &&
+            vm.data &&
+            vm.data.items.length > 0 &&
+            vm.filteredItems.length === 0 && (
               <div className="px-1 py-10 text-sm text-muted-foreground">
-                No chats match “{query}”.
+                No chats match "{vm.query}".
               </div>
             )}
 
           <ul className="divide-y divide-border/80">
-            {filteredItems.map((conv: ConversationListItem) => (
+            {vm.filteredItems.map((conv: ConversationListItem) => (
               <li key={conv.id}>
                 <button
                   type="button"
-                  onClick={() =>
-                    navigate({
-                      to: "/chat/$conversationId",
-                      params: { conversationId: conv.id },
-                    })
-                  }
+                  onClick={() => vm.onNavigateConversation(conv.id)}
                   className="w-full bg-transparent px-5 py-6 text-left focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/15"
                 >
                   <div className="flex items-center justify-between gap-6">
