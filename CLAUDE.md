@@ -35,52 +35,52 @@ Optional observability vars: `SENTRY_DSN`, `VITE_SENTRY_DSN`, `VITE_GA_MEASUREME
 
 ```
 src/
-  client.tsx       # Browser entry point
-  router.tsx       # TanStack Router instance
-  shared/          # Singletons and infrastructure (no business logic)
-    auth/          # better-auth instance
-    db/            # Prisma client singleton
-    redis/         # ioredis client singleton
-    ai/            # Vercel AI SDK openai client + feature config
-    mail/          # Nodemailer transport + sendEmail()
-    rate-limit/    # Redis-backed rate limiters (auth, chat)
-    logger/        # pino logger singleton
-    sentry/        # Sentry server + client initialization
-    trpc/          # tRPC init, context, root router
-  modules/         # Feature modules — each owns schema, service, router, tests
-    auth/
-    user/
-    chat/
-    config/        # Router-only module: exposes feature flags (chatEnabled) via publicProcedure
-  hooks/           # Sub-hooks called by ViewModel hooks
-    use-chat-session.ts  # Chat UI orchestration (useChat + scroll + tRPC)
-    use-chat-scroll.ts   # Scroll position tracking
-    use-mobile.ts        # Responsive breakpoint helper
-  routes/          # TanStack file-based routes
-    __root.tsx     # HTML shell with GA4 + Sentry error boundary
-    index.tsx      # Public landing page
-    _authed.tsx    # Auth guard + sidebar layout (SidebarProvider + AppSidebar + SidebarInset)
-    (auth)/        # Public auth pages (login, register, verify-email)
-    _authed/       # Protected pages — each page has a view + view-model
-      (profile)/
-      chat/
-        (list)/    # /chat — conversation list
-        (new)/     # /chat/new — new conversation
-        (conversation)/ # /chat/:conversationId
-    api/           # Server-only API handlers
-      auth/$.ts    # better-auth catch-all handler
-      trpc/$.ts    # tRPC fetch handler
-      chat.ts      # AI streaming endpoint (Vercel AI SDK)
-      health.ts    # Health check endpoint
-  components/
-    ui/            # shadcn/ui primitives (Radix-based) — do not modify directly
-    layout/        # App-level layout (AppSidebar, AuthShell, Brand, Editorial, Navbar)
-    chat/          # Chat feature components (ConversationPanel, ComposerArea, MessageMarkdown)
-  lib/
-    trpc.ts        # createTRPCReact client
-    auth-client.ts # better-auth browser client
-  test/
-    setup.ts       # Vitest global mocks (Prisma, Redis, rate limiters)
+├── client.tsx              # Browser entry point
+├── router.tsx              # TanStack Router instance
+├── shared/                 # Singletons and infrastructure (no business logic)
+│   ├── auth/               # better-auth instance
+│   ├── db/                 # Prisma client singleton
+│   ├── redis/              # ioredis client singleton
+│   ├── ai/                 # Vercel AI SDK openai client + feature config
+│   ├── mail/               # Nodemailer transport + sendEmail()
+│   ├── rate-limit/         # Redis-backed rate limiters (auth, chat)
+│   ├── logger/             # pino logger singleton
+│   ├── sentry/             # Sentry server + client initialization
+│   └── trpc/               # tRPC init, context, root router
+├── modules/                # Feature modules — each owns schema, service, router, tests
+│   ├── auth/
+│   ├── user/
+│   ├── chat/
+│   └── config/             # Router-only module: exposes feature flags (chatEnabled) via publicProcedure
+├── hooks/                  # Sub-hooks called by ViewModel hooks
+│   ├── use-chat-session.ts  # Chat UI orchestration (useChat + scroll + tRPC)
+│   ├── use-chat-scroll.ts   # Scroll position tracking
+│   └── use-mobile.ts        # Responsive breakpoint helper
+├── routes/                 # TanStack file-based routes
+│   ├── __root.tsx          # HTML shell with GA4 + Sentry error boundary
+│   ├── index.tsx           # Public landing page
+│   ├── _authed.tsx         # Auth guard + sidebar layout (SidebarProvider + AppSidebar + SidebarInset)
+│   ├── (auth)/             # Public auth pages (login, register, verify-email)
+│   ├── _authed/            # Protected pages — each page has a view + view-model
+│   │   ├── (profile)/
+│   │   └── chat/
+│   │       ├── (list)/     # /chat — conversation list
+│   │       ├── (new)/      # /chat/new — new conversation
+│   │       └── (conversation)/ # /chat/:conversationId
+│   └── api/                # Server-only API handlers
+│       ├── auth/$.ts       # better-auth catch-all handler
+│       ├── trpc/$.ts       # tRPC fetch handler
+│       ├── chat.ts         # AI streaming endpoint (Vercel AI SDK)
+│       └── health.ts       # Health check endpoint
+├── components/
+│   ├── ui/                 # shadcn/ui primitives (Radix-based) — do not modify directly
+│   ├── layout/             # App-level layout (AppSidebar, AuthShell, Brand, Editorial, Navbar)
+│   └── chat/               # Chat feature components (ConversationPanel, ComposerArea, MessageMarkdown)
+├── lib/
+│   ├── trpc.ts             # createTRPCReact client
+│   └── auth-client.ts      # better-auth browser client
+└── test/
+    └── setup.ts            # Vitest global mocks (Prisma, Redis, rate limiters)
 ```
 
 ## Adding a Feature
