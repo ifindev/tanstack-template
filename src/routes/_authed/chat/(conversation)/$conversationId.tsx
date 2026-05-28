@@ -19,7 +19,7 @@ function ConversationPage() {
         <PageContainer className="flex h-full min-h-0 flex-col py-6 sm:py-8">
           <div className="mx-auto flex w-full max-w-3xl min-h-0 flex-1 flex-col">
             <ConversationPanel
-              bottomRef={vm.chatSession.bottomRef}
+              bottomRef={vm.scroll.bottomRef}
               isConversationLoading={false}
               isResponding={vm.chatSession.isResponding}
               messages={vm.chatSession.messages}
@@ -31,15 +31,15 @@ function ConversationPage() {
 
       <ComposerArea
         input={vm.chatSession.input}
-        isAtBottom={vm.chatSession.isAtBottom}
+        isAtBottom={vm.scroll.isAtBottom}
         chatError={vm.chatSession.chatError}
         composerDisabled={vm.chatSession.composerDisabled}
         chatEnabled={vm.chatSession.chatEnabled}
-        bottomRef={vm.chatSession.bottomRef}
+        bottomRef={vm.scroll.bottomRef}
         isLoadingFeatures={vm.chatSession.isLoadingFeatures}
         onInputChange={vm.chatSession.onInputChange}
         onSubmit={vm.chatSession.onSubmit}
-        onScrollToBottom={vm.chatSession.onScrollToBottom}
+        onScrollToBottom={vm.scroll.scrollToBottom}
       />
     </main>
   );

@@ -2,6 +2,7 @@ import { useParams } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { useChatSession } from "@/hooks/use-chat-session";
+import { useChatScroll } from "@/hooks/use-chat-scroll";
 import type { ChatUiMessage } from "@/modules/chat/ui";
 
 function mapMessagesToUiFormat(
@@ -47,7 +48,10 @@ export function useConversationViewModel() {
     isConversationLoading: isLoading,
   });
 
+  const scroll = useChatScroll();
+
   return {
     chatSession,
+    scroll,
   };
 }
