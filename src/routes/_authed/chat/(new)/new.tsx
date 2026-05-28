@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageContainer } from "@/components/layout/editorial";
 import ConversationPanel from "@/components/chat/conversation-panel";
 import ComposerArea from "@/components/chat/composer-area";
-import { useNewConversationViewModel } from "./new.view-model";
+import { useNewConversationViewModel } from "./-new.view-model";
 
 export const Route = createFileRoute("/_authed/chat/(new)/new")({
   component: NewConversationPage,
