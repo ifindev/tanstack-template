@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertCircle, Loader2, MailCheck } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Loader2, MailCheck } from "lucide-react";
 import { AuthShell } from "@/components/layout/auth-shell";
 import { Button } from "@/components/ui/button";
 import {
@@ -86,12 +86,27 @@ function RegisterPage() {
 
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                aria-invalid={!!vm.errors.password}
-                {...vm.register("password")}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={vm.showPassword ? "text" : "password"}
+                  aria-invalid={!!vm.errors.password}
+                  className="pr-10"
+                  {...vm.register("password")}
+                />
+                <button
+                  type="button"
+                  onClick={vm.toggleShowPassword}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
+                  aria-label={vm.showPassword ? "Hide password" : "Show password"}
+                >
+                  {vm.showPassword ? (
+                    <EyeOff className="size-4" />
+                  ) : (
+                    <Eye className="size-4" />
+                  )}
+                </button>
+              </div>
               {vm.errors.password && (
                 <p className="text-sm text-destructive">
                   {vm.errors.password.message}

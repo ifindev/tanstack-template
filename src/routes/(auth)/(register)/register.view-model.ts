@@ -10,6 +10,7 @@ type FormData = z.infer<typeof registerSchema>;
 export function useRegisterViewModel() {
   const [success, setSuccess] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -33,6 +34,8 @@ export function useRegisterViewModel() {
   return {
     success,
     serverError,
+    showPassword,
+    toggleShowPassword: () => setShowPassword((v) => !v),
     register,
     handleSubmit,
     errors,
