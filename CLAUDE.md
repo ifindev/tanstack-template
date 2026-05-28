@@ -92,7 +92,7 @@ Follow the module pattern used by `auth`, `user`, and `chat`:
 3. **`src/modules/<name>/router.ts`** — tRPC router; use `protectedProcedure` for auth-required endpoints
 4. **`src/shared/trpc/router.ts`** — Add the new router to `appRouter`
 5. **`src/routes/_authed/<name>/(<group>)/<name>.tsx`** — Page view (calls one ViewModel hook)
-6. **`src/routes/_authed/<name>/(<group>)/<name>.view-model.ts`** — ViewModel hook (owns all logic)
+6. **`src/routes/_authed/<name>/(<group>)/-<name>.view-model.ts`** — ViewModel hook (owns all logic)
 
 For router-only modules (feature flags, no DB): skip steps 1–2, only create the router.
 
@@ -127,7 +127,7 @@ vi.mocked(prisma.conversation.create).mockResolvedValueOnce(fake as never);
 
 - **Imports**: use `@/` alias (maps to `src/`), never relative paths crossing module boundaries
 - **Zod + react-hook-form**: cast schema as `any` in `zodResolver` if resolver generics drift from schema types.
-- **ViewModel pattern**: Every page has a `<name>.view-model.ts` co-located in its route group directory. The view calls one ViewModel hook and passes all values as explicit named props to components. Never put hooks, logic, or data fetching in route files or components. See `docs/guides/application-architecture.md`.
+- **ViewModel pattern**: Every page has a `-<name>.view-model.ts` co-located in its route group directory (prefixed with `-` so TanStack Router ignores it). The view calls one ViewModel hook and passes all values as explicit named props to components. Never put hooks, logic, or data fetching in route files or components. See `docs/guides/application-architecture.md`.
 - **Sub-hooks**: Domain hooks (e.g. `useChatSession`, `useChatScroll`) live in `src/hooks/` and are composed by ViewModel hooks — not imported directly into components or route files.
 - **Components**: All React components live under `src/components/`. Never define a reusable component inside `src/routes/` — routes are for pages only. Use `ui/` for shadcn primitives, `layout/` for app-wide layout, and `<feature>/` subdirectories (e.g., `chat/`) for feature-specific components. Each component file exports one component as a `default export` using a `function` declaration (not an arrow function). See `docs/guides/component-creation.md`.
 - **CSS**: Tailwind v4 (`@import "tailwindcss"`) — `globals.css` is excluded from Biome
