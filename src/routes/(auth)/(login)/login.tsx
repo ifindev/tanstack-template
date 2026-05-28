@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useLoginViewModel } from "./login.view-model";
+import { useLoginViewModel } from "./-login.view-model";
 
 export const Route = createFileRoute("/(auth)/(login)/login")({
   component: LoginPage,

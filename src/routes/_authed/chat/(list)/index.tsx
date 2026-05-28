@@ -4,7 +4,7 @@ import { AlertCircle, Loader2, MessageSquarePlus, Search } from "lucide-react";
 import { PageContainer } from "@/components/layout/editorial";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useChatListViewModel } from "./chat.view-model";
+import { useChatListViewModel } from "./-chat.view-model";
 
 type ConversationListItem = {
   id: string;

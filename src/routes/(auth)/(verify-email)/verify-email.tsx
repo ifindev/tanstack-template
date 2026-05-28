@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useVerifyEmailViewModel } from "./verify-email.view-model";
+import { useVerifyEmailViewModel } from "./-verify-email.view-model";
 
 export const Route = createFileRoute("/(auth)/(verify-email)/verify-email")({
   component: VerifyEmailPage,
