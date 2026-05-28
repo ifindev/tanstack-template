@@ -1,7 +1,7 @@
 ---
-description: Analyze all git changes and create atomic conventional commits, one logical unit at a time. Use when asked to commit, run /commit, or told to "commit all changes".
+description: Analyze all git changes, create atomic conventional commits, and push the finished branch to origin. Use when asked to commit, run /commit, or told to "commit all changes".
 disable-model-invocation: true
-allowed-tools: Bash(git status *) Bash(git diff *) Bash(git add *) Bash(git commit *) Bash(git log *)
+allowed-tools: Bash(git status *) Bash(git diff *) Bash(git add *) Bash(git commit *) Bash(git log *) Bash(git rev-parse *) Bash(git push *)
 ---
 
 # Atomic Commit Workflow
@@ -23,7 +23,7 @@ git log --oneline -5
 
 ---
 
-You are now performing an atomic commit workflow. Follow all 6 steps exactly.
+You are now performing an atomic commit workflow. Follow all 7 steps exactly.
 
 ## Step 1 — List every changed file
 
@@ -130,12 +130,31 @@ EOF
 - **Auto-generated files** (`routeTree.gen.ts`): always a standalone `chore(<scope>): regenerate <name>` commit with no body bullets — just a single line subject
 - **Files spanning multiple modules** (e.g., a shared config updated for a specific feature): scope to the driving feature
 
-## Step 6 — Report summary
+## Step 6 — Push the branch to origin
 
-After all commits complete, print:
+Local commits are not the endpoint. After the final commit, always push the current branch to the `origin` remote.
+
+1. Resolve the current branch name:
+```bash
+git rev-parse --abbrev-ref HEAD
+```
+2. Try a normal push to `origin` for that branch:
+```bash
+git push origin <current-branch>
+```
+3. If that push fails because the branch has not been published yet, push again with upstream tracking:
+```bash
+git push --set-upstream origin <current-branch>
+```
+
+Do not skip this step. The workflow is only complete once the branch has been pushed successfully.
+
+## Step 7 — Report summary
+
+After all commits and the push complete, print:
 
 ```
-Done. Commits created:
+Done. Commits created and pushed:
 
   abc1234  feat(chat): add conversation schema and service layer
   def5678  feat(chat): wire chat router and add router tests
@@ -143,4 +162,5 @@ Done. Commits created:
   jkl3456  chore(routes): regenerate route tree
 
 4 commits total.
+Pushed to origin/<current-branch>.
 ```
