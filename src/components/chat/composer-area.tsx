@@ -7,9 +7,9 @@ type ComposerAreaProps = {
   isAtBottom: boolean;
   chatError: string | null;
   composerDisabled: boolean;
+  canSubmit: boolean;
   chatEnabled: boolean;
   isLoadingFeatures: boolean;
-  bottomRef: React.RefObject<HTMLDivElement | null>;
   onInputChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onSubmit: (event: React.FormEvent) => void;
   onScrollToBottom: () => void;
@@ -20,9 +20,9 @@ export default function ComposerArea({
   isAtBottom,
   chatError,
   composerDisabled,
+  canSubmit,
   chatEnabled,
   isLoadingFeatures,
-  bottomRef,
   onInputChange,
   onSubmit,
   onScrollToBottom,
@@ -83,7 +83,7 @@ export default function ComposerArea({
               <div className="flex justify-end">
                 <Button
                   type="submit"
-                  disabled={composerDisabled || !input.trim()}
+                  disabled={!canSubmit}
                 >
                   <Send className="size-4" />
                   Send
@@ -93,7 +93,6 @@ export default function ComposerArea({
           </form>
         </div>
       </div>
-      <div ref={bottomRef} />
     </div>
   );
 }
