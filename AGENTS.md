@@ -24,20 +24,20 @@ Architectural reference for AI coding agents working in this codebase.
 
 ```
 src/
-  client.tsx     Browser entry point
-  router.tsx     TanStack Router instance
-  shared/        Infrastructure singletons — import from here, never instantiate elsewhere
-    logger/      pino singleton; use logger.child({ module }) per feature
-    sentry/      Sentry server and client init files
-  modules/       Feature modules — each is self-contained (schema + service + router + tests)
-  hooks/         Sub-hooks called by ViewModel hooks (use-chat-session, use-chat-scroll, use-mobile)
-  routes/        File-based routes (TanStack Router convention)
-  components/    React components
-    ui/          shadcn/ui primitives — do not modify these directly
-    layout/      App-wide layout components (AppSidebar, AuthShell, Brand, Editorial, Navbar)
-    chat/        Chat feature components (ConversationPanel, ComposerArea, MessageMarkdown)
-  lib/           Thin client wrappers (tRPC client, auth client)
-  test/          Shared Vitest setup only (global mocks)
+├── client.tsx   # Browser entry point
+├── router.tsx   # TanStack Router instance
+├── shared/      # Infrastructure singletons — import from here, never instantiate elsewhere
+│   ├── logger/  # pino singleton; use logger.child({ module }) per feature
+│   └── sentry/  # Sentry server and client init files
+├── modules/     # Feature modules — each is self-contained (schema + service + router + tests)
+├── hooks/       # Sub-hooks called by ViewModel hooks (use-chat-session, use-chat-scroll, use-mobile)
+├── routes/      # File-based routes (TanStack Router convention)
+├── components/  # React components
+│   ├── ui/      # shadcn/ui primitives — do not modify these directly
+│   ├── layout/  # App-wide layout components (AppSidebar, AuthShell, Brand, Editorial, Navbar)
+│   └── chat/    # Chat feature components (ConversationPanel, ComposerArea, MessageMarkdown)
+├── lib/         # Thin client wrappers (tRPC client, auth client)
+└── test/        # Shared Vitest setup only (global mocks)
 ```
 
 ## Module Pattern
@@ -46,10 +46,10 @@ Most features follow the same four-file structure:
 
 ```
 src/modules/<feature>/
-  schema.ts    Zod schemas for all inputs
-  service.ts   Pure async functions — takes primitives, calls prisma.*, returns data
-  router.ts    tRPC router — calls service functions, handles tRPC errors
-  *.test.ts    Tests co-located with the file they test
+├── schema.ts   # Zod schemas for all inputs
+├── service.ts  # Pure async functions — takes primitives, calls prisma.*, returns data
+├── router.ts   # tRPC router — calls service functions, handles tRPC errors
+└── *.test.ts   # Tests co-located with the file they test
 ```
 
 **Service functions** must not reference tRPC context or HTTP. They take plain arguments (`userId: string`, etc.) and return plain data. This makes them independently testable.
