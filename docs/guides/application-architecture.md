@@ -51,12 +51,14 @@ ViewModel hooks orchestrate all page logic. They:
 - Return a flat object literal containing only named references to already-resolved values
 - **Never** do computation or construction inside the return literal
 
-**File location:** `src/routes/[path]/(view-name)/[route-name].view-model.ts`
+**File location:** `src/routes/[path]/(view-name)/-[route-name].view-model.ts`
 
 **Naming convention:**
-- `new.view-model.ts` for a route file `new.tsx`
-- `login.view-model.ts` for a route file `login.tsx`
-- `chat.view-model.ts` for a route file `index.tsx` (named after the URL segment, not the filename)
+- `-new.view-model.ts` for a route file `new.tsx`
+- `-login.view-model.ts` for a route file `login.tsx`
+- `-chat.view-model.ts` for a route file `index.tsx` (named after the URL segment, not the filename)
+
+The `-` prefix is required: TanStack Router scans all files in `src/routes/` and warns about any file that doesn't export a `Route`. Prefixing with `-` uses the router's `routeFileIgnorePrefix` setting to exclude non-route files silently.
 
 **Example:**
 ```ts
@@ -158,7 +160,7 @@ export function useChatScroll() {
 Sub-hooks can be composed by ViewModel hooks:
 
 ```ts
-// src/routes/_authed/chat/(new)/new.view-model.ts
+// src/routes/_authed/chat/(new)/-new.view-model.ts
 export function useNewConversationViewModel() {
   const chatSession = useChatSession({
     // useChatSession internally uses useChatScroll
@@ -237,23 +239,23 @@ src/
       chat/
         (new)/
           new.tsx                 ← View: route to /chat/new
-          new.view-model.ts       ← ViewModel: owns all logic for /chat/new
+          -new.view-model.ts       ← ViewModel: owns all logic for /chat/new
         (conversation)/
           $conversationId.tsx      ← View: route to /chat/:conversationId
-          $conversationId.view-model.ts  ← ViewModel: owns params, queries, composition
+          -$conversationId.view-model.ts  ← ViewModel: owns params, queries, composition
         (list)/
           index.tsx               ← View: route to /chat
-          chat.view-model.ts      ← ViewModel: owns queries, filtering, navigation
+          -chat.view-model.ts      ← ViewModel: owns queries, filtering, navigation
       (profile)/
         profile.tsx              ← View
-        profile.view-model.ts    ← ViewModel
+        -profile.view-model.ts    ← ViewModel
     (auth)/
       (login)/
         login.tsx                ← View
-        login.view-model.ts      ← ViewModel
+        -login.view-model.ts      ← ViewModel
       (register)/
         register.tsx             ← View
-        register.view-model.ts   ← ViewModel
+        -register.view-model.ts   ← ViewModel
   components/
     chat/
       conversation-panel.tsx     ← Pure component

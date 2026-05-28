@@ -19,7 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useChatListViewModel } from "./chat.view-model";
+import { useChatListViewModel } from "./-chat.view-model";
 
 type ConversationListItem = {
   id: string;
