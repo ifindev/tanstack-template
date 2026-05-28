@@ -27,7 +27,10 @@ export function useNewConversationViewModel() {
     onChatFinished: handleChatFinished,
   });
 
-  const scroll = useChatScroll();
+  const scroll = useChatScroll({
+    messages: chatSession.messages,
+    isResponding: chatSession.isResponding,
+  });
 
   return {
     chatSession,
