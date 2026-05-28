@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useRef } from "react";
 import { useChatSession } from "@/hooks/use-chat-session";
+import { useChatScroll } from "@/hooks/use-chat-scroll";
 
 export function useNewConversationViewModel() {
   const navigate = useNavigate();
@@ -26,7 +27,10 @@ export function useNewConversationViewModel() {
     onChatFinished: handleChatFinished,
   });
 
+  const scroll = useChatScroll();
+
   return {
     chatSession,
+    scroll,
   };
 }
