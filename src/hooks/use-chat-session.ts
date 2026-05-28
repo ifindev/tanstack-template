@@ -6,7 +6,6 @@ import {
   CONVERSATION_CREATED_DATA_PART,
 } from "@/modules/chat/ui";
 import { trpc } from "@/lib/trpc";
-import { useChatScroll } from "./use-chat-scroll";
 
 type UseChatSessionProps = {
   chatId: string;
@@ -30,7 +29,6 @@ export function useChatSession({
 }: UseChatSessionProps) {
   const { data: features, isLoading: isLoadingFeatures } =
     trpc.config.features.useQuery();
-  const { bottomRef, isAtBottom, scrollToBottom } = useChatScroll();
 
   const [input, setInput] = useState("");
   const [chatError, setChatError] = useState<string | null>(null);
@@ -75,15 +73,12 @@ export function useChatSession({
   return {
     messages,
     input,
-    isAtBottom,
     chatError,
     isResponding,
     composerDisabled,
     chatEnabled,
     isLoadingFeatures,
-    bottomRef,
     onInputChange: handleInputChange,
     onSubmit: handleSubmit,
-    onScrollToBottom: scrollToBottom,
   };
 }
