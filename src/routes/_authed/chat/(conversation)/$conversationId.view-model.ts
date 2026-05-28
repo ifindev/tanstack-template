@@ -1,8 +1,8 @@
 import { useParams } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { trpc } from "@/lib/trpc";
-import { useChatSession } from "@/hooks/use-chat-session";
 import { useChatScroll } from "@/hooks/use-chat-scroll";
+import { useChatSession } from "@/hooks/use-chat-session";
+import { trpc } from "@/lib/trpc";
 import type { ChatUiMessage } from "@/modules/chat/ui";
 
 function mapMessagesToUiFormat(
@@ -36,10 +36,12 @@ export function useConversationViewModel() {
   const { data, isLoading } = trpc.chat.getConversation.useQuery({
     id: conversationId,
   });
+
   const initialMessages = useMemo(
     () => mapMessagesToUiFormat(data?.messages),
     [data?.messages],
   );
+  const title = data?.title ?? null;
 
   const chatSession = useChatSession({
     chatId: conversationId,
@@ -48,10 +50,24 @@ export function useConversationViewModel() {
     isConversationLoading: isLoading,
   });
 
-  const scroll = useChatScroll();
+  const scroll = useChatScroll({
+    messages: chatSession.messages,
+    isResponding: chatSession.isResponding,
+  });
+
+  const handleSubmit = (event: React.FormEvent) => {
+    if (chatSession.canSubmit) {
+      scroll.snapToBottom();
+    }
+
+    chatSession.onSubmit(event);
+  };
 
   return {
     chatSession,
     scroll,
+    onSubmit: handleSubmit,
+    title,
+    isLoading,
   };
 }
