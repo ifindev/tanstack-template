@@ -137,10 +137,7 @@ Detailed references:
 
 ### Editor setup
 
-VS Code and Cursor read the shared settings in `.vscode/`. Install the recommended
-Biome extension when prompted. JavaScript, TypeScript, JSX, TSX, JSON, and JSONC
-files will then use Biome as their default formatter, format on save, apply safe
-lint fixes, and organize imports.
+VS Code and Cursor read the shared settings in `.vscode/`. It is recommended to install the Biome extension for this repository. When prompted, accept the recommended extension. JavaScript, TypeScript, JSX, TSX, JSON, and JSONC files will then use Biome as their default formatter, format on save, apply safe lint fixes, and organize imports.
 
 If another formatter still runs, disable its workspace formatting for this
 repository or accept Biome as the default formatter when the editor asks.
