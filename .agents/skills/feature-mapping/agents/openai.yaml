@@ -1,0 +1,4 @@
+interface:
+  display_name: "Feature Mapping"
+  short_description: "Map capabilities, access, and dependencies"
+  default_prompt: "Use $feature-mapping to turn approved discovery into delivery slices and waves."

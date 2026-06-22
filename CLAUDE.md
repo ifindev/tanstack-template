@@ -1,5 +1,19 @@
 # CLAUDE.md
 
+## Agent entry point
+
+Read `AGENTS.md` first. It is the canonical instruction file for both Claude Code and Codex.
+
+Before implementation, also read:
+
+1. `docs/specs/_overview.md`
+2. `docs/specs/_context-block.md`
+3. `docs/specs/_decisions.md`
+4. `docs/tasks/_index.md`
+5. the selected task and every referenced specification
+
+Workflow skills are exposed in `.claude/skills/` from the canonical `.agents/skills/` source. Use the skill matching the current phase; do not edit the symlinked Claude copy independently.
+
 ## Commands
 
 ```bash
@@ -13,6 +27,7 @@ pnpm format        # Auto-format with Biome
 
 pnpm test          # Watch mode
 pnpm test --run    # Single run (use this in CI / before committing)
+pnpm harness:validate # Validate workflow files and dual-agent skills
 
 pnpm db:migrate    # Create + apply dev migration
 pnpm db:deploy     # Apply migrations in production

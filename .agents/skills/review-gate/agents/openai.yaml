@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Gate"
+  short_description: "Evaluate evidence at workflow gates"
+  default_prompt: "Use $review-gate to evaluate whether this artifact can advance."

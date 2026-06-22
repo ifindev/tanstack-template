@@ -2,6 +2,44 @@
 
 Architectural reference for AI coding agents working in this codebase.
 
+## AI Delivery Harness
+
+This repository uses the workflow in `docs/ai-workflow/README.md`.
+
+Before planning or implementation:
+
+1. Read `docs/specs/_overview.md`.
+2. Read `docs/specs/_context-block.md`.
+3. Read `docs/specs/_decisions.md`.
+4. For implementation, read `docs/tasks/_index.md`, the selected task, and every `spec_refs` entry.
+
+Canonical repository skills live in `.agents/skills/` and are auto-discovered by Codex. Claude Code receives the same skills through `.claude/skills/`; do not maintain duplicate skill bodies.
+
+| Phase | Skill |
+|---|---|
+| Discovery | `workflow-intake` |
+| Capability planning | `feature-mapping` |
+| Data planning | `data-modeling` |
+| Behavioral planning | `epic-and-flow` |
+| Boundary contracts | `api-spec` |
+| Task planning | `task-generation` |
+| Implementation | `execute-task` |
+| Phase review | `review-gate` |
+| Scope or requirement changes | `change-management` |
+| Release and acceptance | `delivery-review` |
+| Atomic Git commits | `commit` (explicit invocation only) |
+| GitHub pull request creation | `create-pr` (explicit invocation only) |
+
+Universal workflow rules:
+
+- Distinguish confirmed facts, assumptions, inferences, and decisions.
+- Do not invent product behavior to close a material specification gap.
+- Stop for human direction on scope, authorization, persisted data, security, destructive behavior, or public-contract ambiguity.
+- Locked scope changes only through recorded change management.
+- Build one task at a time and preserve unrelated working-tree changes.
+- A task is complete only when its definition of done has evidence.
+- Run `pnpm harness:validate` after changing the harness.
+
 ## Stack
 
 | Layer | Technology |

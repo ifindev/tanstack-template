@@ -1,0 +1,4 @@
+interface:
+  display_name: "Change Management"
+  short_description: "Assess and control approved-scope changes"
+  default_prompt: "Use $change-management to assess this request and update affected artifacts."

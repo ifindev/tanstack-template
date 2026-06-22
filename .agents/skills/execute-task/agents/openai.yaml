@@ -1,0 +1,4 @@
+interface:
+  display_name: "Execute Task"
+  short_description: "Build and verify one approved task"
+  default_prompt: "Use $execute-task to implement and verify the selected ready task."
