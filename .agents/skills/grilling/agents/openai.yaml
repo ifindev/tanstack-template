@@ -1,0 +1,4 @@
+interface:
+  display_name: "Grilling"
+  short_description: "Relentlessly stress-test a plan or design"
+  default_prompt: "Use $grilling to stress-test this plan one decision at a time."
