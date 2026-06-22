@@ -11,6 +11,10 @@ The harness is intentionally agent-neutral:
 - `docs/tasks/` contains executable work state.
 - `docs/client-comms/` contains approval and scope evidence.
 
+The original source document that seeded this harness is preserved verbatim at
+[`docs/ai-workflow/source-material/original-harness-seed.md`](source-material/original-harness-seed.md).
+Treat it as evolving source material, not the normalized operating spec.
+
 ## Operating model
 
 ```mermaid
