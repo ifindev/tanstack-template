@@ -1,0 +1,4 @@
+interface:
+  display_name: "Data Modeling"
+  short_description: "Design domain and persistence models"
+  default_prompt: "Use $data-modeling to design the approved epic's data model and invariants."
