@@ -9,6 +9,8 @@
     "check": "biome check .",
     "format": "biome format --write .",
     "test": "vitest",
+    "harness:validate": "node scripts/agent-harness/validate.mjs",
+    "harness:new-project": "node scripts/agent-harness/new-project.mjs",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
