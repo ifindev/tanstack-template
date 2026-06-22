@@ -1,0 +1,4 @@
+interface:
+  display_name: "Interface Spec"
+  short_description: "Define stable system boundary contracts"
+  default_prompt: "Use $api-spec to derive complete boundary contracts from the approved flows."
