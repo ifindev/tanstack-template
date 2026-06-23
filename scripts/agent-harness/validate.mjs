@@ -11,13 +11,11 @@ const requiredProjectFiles = [
   "AGENTS.md",
   "CLAUDE.md",
   "docs/ai-workflow/README.md",
-  "docs/ai-workflow/review-gates.md",
-  "docs/specs/_overview.md",
-  "docs/specs/_context-block.md",
-  "docs/specs/_decisions.md",
-  "docs/specs/discovery.md",
-  "docs/specs/feature-map.md",
-  "docs/tasks/_index.md",
+  "docs/project-brief.md",
+  "docs/trackers.md",
+  "docs/_templates/project-brief.md",
+  "docs/_templates/epic.md",
+  "docs/_templates/story.md",
 ];
 
 async function exists(filePath) {
