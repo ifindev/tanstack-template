@@ -9,30 +9,18 @@ if (!projectName) {
 }
 
 const root = process.cwd();
-const overviewPath = path.join(root, "docs", "specs", "_overview.md");
-const taskBoardPath = path.join(root, "docs", "tasks", "_index.md");
-const overview = await readFile(overviewPath, "utf8");
+const briefPath = path.join(root, "docs", "project-brief.md");
+const brief = await readFile(briefPath, "utf8");
 
-if (!overview.includes("Status: NOT_STARTED")) {
+if (!brief.includes("<Project Name>")) {
   console.error(
-    "Refusing to overwrite an initialized project. Reset the scaffold manually if intentional.",
+    "Refusing to overwrite an initialized brief. The project-brief.md already names a project. Reset the scaffold manually if intentional.",
   );
   process.exit(1);
 }
 
-const date = new Date().toISOString().slice(0, 10);
-const nextOverview = overview
-  .replace("# Project Overview", `# Project Overview: ${projectName}`)
-  .replace("Status: NOT_STARTED", "Status: DRAFT")
-  .replace("Current phase: Bootstrap", "Current phase: Discovery")
-  .replace("Last updated: YYYY-MM-DD", `Last updated: ${date}`)
-  .replace("- Name:", `- Name: ${projectName}`);
+const nextBrief = brief.replaceAll("<Project Name>", projectName);
+await writeFile(briefPath, nextBrief);
 
-const taskBoard = await readFile(taskBoardPath, "utf8");
-const nextTaskBoard = taskBoard
-  .replace("# Task Board", `# Task Board: ${projectName}`)
-  .replace("Last updated: YYYY-MM-DD", `Last updated: ${date}`);
-
-await writeFile(overviewPath, nextOverview);
-await writeFile(taskBoardPath, nextTaskBoard);
-console.log(`Initialized workflow scaffold for ${projectName}.`);
+console.log(`Initialized project-brief.md for ${projectName}.`);
+console.log("Next: invoke /project-brief (or $project-brief) and describe your project.");

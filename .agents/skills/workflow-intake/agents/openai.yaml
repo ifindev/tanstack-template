@@ -1,4 +1,0 @@
-interface:
-  display_name: "Workflow Intake"
-  short_description: "Turn raw requirements into discovery"
-  default_prompt: "Use $workflow-intake to interrogate these raw requirements and draft discovery."

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Task Generation"
-  short_description: "Create atomic dependency-aware tasks"
-  default_prompt: "Use $task-generation to turn approved specifications into executable tasks."

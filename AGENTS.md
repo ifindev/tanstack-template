@@ -4,40 +4,31 @@ Architectural reference for AI coding agents working in this codebase.
 
 ## AI Delivery Harness
 
-This repository uses the workflow in `docs/ai-workflow/README.md`.
+This repository uses the lightweight workflow in [`docs/ai-workflow/README.md`](docs/ai-workflow/README.md). Three skills, two layers of docs, one tracker file.
 
-Before planning or implementation:
+Before planning or implementation, read in order:
 
-1. Read `docs/specs/_overview.md`.
-2. Read `docs/specs/_context-block.md`.
-3. Read `docs/specs/_decisions.md`.
-4. For implementation, read `docs/tasks/_index.md`, the selected task, and every `spec_refs` entry.
+1. [`docs/project-brief.md`](docs/project-brief.md) — project-altitude truth (product, roles, features, RBAC, data model, routes, tech)
+2. [`docs/trackers.md`](docs/trackers.md) — story board state
+3. The selected story file under `docs/features/<id>-<slug>/<NN>-<slug>.md` and its `epic.md`
 
-Canonical repository skills live in `.agents/skills/` and are auto-discovered by Codex. Claude Code receives the same skills through `.claude/skills/`; do not maintain duplicate skill bodies.
+Canonical skill bodies live in `.agents/skills/` (auto-discovered by Codex). Claude Code receives them via symlinks in `.claude/skills/`. Do not maintain duplicate skill bodies.
 
-| Phase | Skill |
-|---|---|
-| Discovery | `workflow-intake` |
-| Capability planning | `feature-mapping` |
-| Data planning | `data-modeling` |
-| Behavioral planning | `epic-and-flow` |
-| Boundary contracts | `api-spec` |
-| Task planning | `task-generation` |
-| Implementation | `execute-task` |
-| Phase review | `review-gate` |
-| Scope or requirement changes | `change-management` |
-| Release and acceptance | `delivery-review` |
-| Atomic Git commits | `commit` (explicit invocation only) |
-| GitHub pull request creation | `create-pr` (explicit invocation only) |
+| Skill | Purpose | Modes |
+|---|---|---|
+| `project-brief` | Draft / update `docs/project-brief.md` | `create`, `update` |
+| `feature-epic` | Draft a feature epic + stories; sync `docs/trackers.md` | `create <id>-<slug>`, `add-story <id>-<slug> <story>` |
+| `execute-task` | Implement one story end-to-end | `next`, `<id>-<slug>/<NN>-<story>` |
+| `commit` | Atomic conventional commits (explicit invocation only) | — |
+| `create-pr` | Open a GitHub PR with evidence (explicit invocation only) | — |
+| `grill-me` / `grilling` | One-question-at-a-time interrogation to sharpen a plan before drafting | — |
 
-Universal workflow rules:
+Workflow rules:
 
-- Distinguish confirmed facts, assumptions, inferences, and decisions.
-- Do not invent product behavior to close a material specification gap.
-- Stop for human direction on scope, authorization, persisted data, security, destructive behavior, or public-contract ambiguity.
-- Locked scope changes only through recorded change management.
-- Build one task at a time and preserve unrelated working-tree changes.
-- A task is complete only when its definition of done has evidence.
+- Trust the spec set. The brief is project-altitude truth; the story file is the construction doc. Never let implementation silently become the spec.
+- Stop for human direction on scope, authorization, persisted data, security, destructive behavior, or contract ambiguity.
+- Build one story at a time. While a story line in `docs/trackers.md` is `- [-]`, do not start another.
+- A story is complete only when every Task in its checklist has evidence (tests passing, manual flow walked) and its trackers line is `- [x]`.
 - Run `pnpm harness:validate` after changing the harness.
 
 ## Stack
