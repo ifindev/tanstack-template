@@ -4,57 +4,36 @@ A production-ready full-stack template using TanStack Start, tRPC v11, better-au
 
 ## AI Coding Workflow
 
-The template includes a requirements-to-delivery harness for Codex and Claude Code:
+The template ships with a lightweight, agent-driven workflow for taking a project from idea to working code with Claude Code or Codex. Three skills, two layers of docs, one tracker file.
 
-- canonical, repository-scoped skills in `.agents/skills/` for Codex;
-- the same skills exposed through `.claude/skills/` for Claude Code;
-- project specifications in `docs/specs/`;
-- task state in `docs/tasks/`;
-- review gates and operating guidance in [`docs/ai-workflow/README.md`](docs/ai-workflow/README.md).
+| Skill | Purpose | Modes |
+|---|---|---|
+| `project-brief` | Draft / update `docs/project-brief.md` — the project's living truth | `create`, `update` |
+| `feature-epic` | Draft a feature epic and its stories; keep `docs/trackers.md` in sync | `create <id>-<slug>`, `add-story <id>-<slug> <story>` |
+| `execute-task` | Implement exactly one story end-to-end | `next`, `<id>-<slug>/<NN>-<story>` |
 
-The skill bodies have one canonical source under `.agents/skills/`. The Claude
-Code entries are symlinks to that source so both agents follow the same
-workflow without duplicated prompts drifting apart.
+Read [`docs/ai-workflow/README.md`](docs/ai-workflow/README.md) for the full workflow, conventions, and examples. Filled-in references live under [`docs/_examples/`](docs/_examples/); empty starters under [`docs/_templates/`](docs/_templates/).
 
-### How shared skills work
-
-Each entry under `.claude/skills/` is a symlink to the matching canonical skill
-directory under `.agents/skills/`. In editors such as Cursor this may look like
-a normal folder, but the arrow badge and resolved hover path indicate it is a
-filesystem link, not a second independent copy.
-
-When adding a new shared skill:
-
-1. Create the real skill at `.agents/skills/<skill-name>/`.
-2. Add the skill files there, usually `SKILL.md`, `agents/openai.yaml`, and any
-   `assets/`.
-3. Create `.claude/skills/<skill-name>` as a symlink to
-   `../../.agents/skills/<skill-name>`.
-4. Run `pnpm harness:validate`.
-5. Restart Codex or Claude Code if the new skill is not detected immediately.
-
-Do not maintain duplicate skill bodies in both trees. Edit the canonical
-`.agents/skills/` copy and let `.claude/skills/` point to it.
-
-### Invoke a skill
+### Skill invocation
 
 | Agent | Explicit invocation | Example |
 |---|---|---|
-| Codex | `$<skill-name>` | `$workflow-intake` |
-| Claude Code | `/<skill-name>` | `/workflow-intake` |
+| Codex | `$<skill-name>` | `$project-brief` |
+| Claude Code | `/<skill-name>` | `/project-brief` |
 
-Most workflow skills may also be selected automatically when your request
-matches their description. Prefer explicit invocation when starting a new
-workflow phase or when you need a particular procedure. The mutation-heavy
-`commit` and `create-pr` skills are explicit-only:
+Utility skills (`commit`, `create-pr`, `grill-me`, `grilling`) are kept alongside the workflow skills and are explicit-only.
 
-| Purpose | Codex | Claude Code |
-|---|---|---|
-| Create approved atomic commits | `$commit` | `/commit` |
-| Push and create a GitHub PR | `$create-pr` | `/create-pr` |
+### Shared skill source
 
-If newly added skills do not appear, restart the relevant agent session so it
-rescans the repository.
+Canonical skill bodies live in `.agents/skills/`. The `.claude/skills/` entries are symlinks pointing at the canonical source so both agents follow the same prompts.
+
+When adding a new shared skill:
+
+1. Create the real skill at `.agents/skills/<skill-name>/SKILL.md`.
+2. Symlink: `ln -s ../../.agents/skills/<skill-name> .claude/skills/<skill-name>`.
+3. Run `pnpm harness:validate`.
+
+Do not duplicate skill bodies between trees.
 
 ### Start a new project
 
@@ -65,47 +44,18 @@ pnpm harness:validate
 
 Then:
 
-1. Complete [`docs/specs/_overview.md`](docs/specs/_overview.md) with the
-   project identity, known stakeholders, constraints, and links or paths to raw
-   source material.
-2. Start discovery with `$workflow-intake` in Codex or `/workflow-intake` in
-   Claude Code. The agent will clarify material gaps before drafting
-   [`docs/specs/discovery.md`](docs/specs/discovery.md).
-3. Review discovery with `$review-gate` or `/review-gate`. A human records
-   stakeholder approval before discovery becomes `LOCKED`.
-4. Continue through capability planning and detailed specifications.
-5. Generate tasks only from approved specifications.
-6. Execute and verify one ready task at a time.
-7. Run the delivery review before release or stakeholder acceptance.
+1. Invoke `/project-brief` (Claude Code) or `$project-brief` (Codex). Describe the project conversationally. The skill suggests reasonable defaults, asks targeted questions for genuine ambiguity, and writes `docs/project-brief.md`.
+2. For each feature row in the brief, invoke `/feature-epic create <id>-<slug>`. The skill drafts the epic and stories, appends to `docs/trackers.md`.
+3. Invoke `/execute-task next` to build the first pending story. Repeat.
 
-No implementation should begin until the relevant review gates pass.
+### Add a feature after MVP
 
-### Run the workflow
+1. Invoke `/project-brief` and describe the new feature. The skill updates the brief, then offers to draft the epic inline.
+2. Continue with `/execute-task` once stories are drafted.
 
-| Phase | Skill | Explanation | Primary output | Required gate | Relevant docs / skills |
-|---|---|---|---|---|---|
-| Bootstrap | Manual setup | Capture project identity, source material, and operating constraints before discovery starts. | [`docs/specs/_overview.md`](docs/specs/_overview.md) | Gate 0 | [`docs/ai-workflow/README.md`](docs/ai-workflow/README.md), [`docs/ai-workflow/artifact-guide.md`](docs/ai-workflow/artifact-guide.md) |
-| Discovery | `workflow-intake` | Turn raw notes or requests into a reviewable problem statement, scope, assumptions, and open questions. | [`docs/specs/discovery.md`](docs/specs/discovery.md) | Gate 1 | [`.agents/skills/workflow-intake/SKILL.md`](.agents/skills/workflow-intake/SKILL.md), [`docs/ai-workflow/review-gates.md`](docs/ai-workflow/review-gates.md) |
-| Capability planning | `feature-mapping` | Break approved discovery into capabilities, actors, dependencies, slices, and build waves. | [`docs/specs/feature-map.md`](docs/specs/feature-map.md) | Gate 2 | [`.agents/skills/feature-mapping/SKILL.md`](.agents/skills/feature-mapping/SKILL.md), [`docs/ai-workflow/review-gates.md`](docs/ai-workflow/review-gates.md) |
-| Data planning | `data-modeling` | Define entities, fields, invariants, lifecycle rules, and storage implications for an epic. | `docs/specs/<epic>/data-model.md` | Gate 3 | [`.agents/skills/data-modeling/SKILL.md`](.agents/skills/data-modeling/SKILL.md), [`docs/ai-workflow/artifact-guide.md`](docs/ai-workflow/artifact-guide.md) |
-| Behavioral planning | `epic-and-flow` | Specify end-to-end behavior, user/system flows, validation, permissions, and edge cases. | `_epic.md` and `flow-*.md` | Gate 3 | [`.agents/skills/epic-and-flow/SKILL.md`](.agents/skills/epic-and-flow/SKILL.md), [`docs/ai-workflow/artifact-guide.md`](docs/ai-workflow/artifact-guide.md) |
-| Boundary contracts | `api-spec` | Lock the interfaces between components or systems so implementation has a stable contract. | `docs/specs/<epic>/api.md` | Gate 3 | [`.agents/skills/api-spec/SKILL.md`](.agents/skills/api-spec/SKILL.md), [`docs/ai-workflow/artifact-guide.md`](docs/ai-workflow/artifact-guide.md) |
-| Task planning | `task-generation` | Convert approved specs into atomic, dependency-aware implementation tasks with clear verification. | `docs/tasks/TASK-*.md` and [`docs/tasks/_index.md`](docs/tasks/_index.md) | Gate 4 | [`.agents/skills/task-generation/SKILL.md`](.agents/skills/task-generation/SKILL.md), [`docs/tasks/_index.md`](docs/tasks/_index.md) |
-| Implementation | `execute-task` | Build one approved task at a time and record the verification evidence that proves it is done. | Code and verification evidence | Gate 5 | [`.agents/skills/execute-task/SKILL.md`](.agents/skills/execute-task/SKILL.md), [`.agents/skills/review-gate/SKILL.md`](.agents/skills/review-gate/SKILL.md), [`docs/specs/_context-block.md`](docs/specs/_context-block.md) |
-| Scope changes | `change-management` | Assess new requirements or defects against locked artifacts and update only impacted specs and tasks. | Change record and affected artifacts | Reopen affected gates | [`.agents/skills/change-management/SKILL.md`](.agents/skills/change-management/SKILL.md), [`.agents/skills/review-gate/SKILL.md`](.agents/skills/review-gate/SKILL.md) |
-| Delivery | `delivery-review` | Prepare stakeholder acceptance and release readiness with traceability, risks, and operational checks. | Release and acceptance evidence | Gate 6 | [`.agents/skills/delivery-review/SKILL.md`](.agents/skills/delivery-review/SKILL.md), [`docs/client-comms/README.md`](docs/client-comms/README.md), [`docs/ai-workflow/review-gates.md`](docs/ai-workflow/review-gates.md) |
+### Detailed references
 
-Use `review-gate` at every transition. During execution, keep
-[`docs/specs/_context-block.md`](docs/specs/_context-block.md),
-[`docs/specs/_decisions.md`](docs/specs/_decisions.md), and
-[`docs/tasks/_index.md`](docs/tasks/_index.md) synchronized with the actual
-project state.
-
-Detailed references:
-
-- [Complete workflow and lifecycle](docs/ai-workflow/README.md)
-- [Review gate criteria](docs/ai-workflow/review-gates.md)
-- [Artifact ownership, statuses, and traceability](docs/ai-workflow/artifact-guide.md)
+- [Workflow guide and examples](docs/ai-workflow/README.md)
 - [Repository architecture and agent rules](AGENTS.md)
 - [Claude Code entry point](CLAUDE.md)
 
