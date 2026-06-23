@@ -1,4 +1,0 @@
-interface:
-  display_name: "Epic and Flow"
-  short_description: "Specify complete behavioral journeys"
-  default_prompt: "Use $epic-and-flow to write the epic and its testable behavior flows."
