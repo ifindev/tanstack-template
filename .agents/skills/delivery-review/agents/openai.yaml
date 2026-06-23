@@ -1,4 +1,0 @@
-interface:
-  display_name: "Delivery Review"
-  short_description: "Verify release and acceptance readiness"
-  default_prompt: "Use $delivery-review to reconcile scope and prepare this release for acceptance."
