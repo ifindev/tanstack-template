@@ -6,13 +6,11 @@ Read `AGENTS.md` first. It is the canonical instruction file for both Claude Cod
 
 Before implementation, also read:
 
-1. `docs/specs/_overview.md`
-2. `docs/specs/_context-block.md`
-3. `docs/specs/_decisions.md`
-4. `docs/tasks/_index.md`
-5. the selected task and every referenced specification
+1. `docs/project-brief.md` — project-altitude truth
+2. `docs/trackers.md` — story board state
+3. The selected story file under `docs/features/<id>-<slug>/<NN>-<slug>.md` and its sibling `epic.md`
 
-Workflow skills are exposed in `.claude/skills/` from the canonical `.agents/skills/` source. Use the skill matching the current phase; do not edit the symlinked Claude copy independently.
+The full workflow guide with examples is in `docs/ai-workflow/README.md`. Workflow skills are exposed in `.claude/skills/` from the canonical `.agents/skills/` source. Use the skill matching the current phase; do not edit the symlinked Claude copy independently.
 
 ## Commands
 
