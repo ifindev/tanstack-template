@@ -8,7 +8,7 @@ Before implementation, also read:
 
 1. `docs/project-brief.md` — project-altitude truth
 2. `docs/trackers.md` — story board state
-3. The selected story file under `docs/features/<id>-<slug>/<NN>-<slug>.md` and its sibling `epic.md`
+3. The selected story file under `docs/features/<id>-<slug>/<NN>-<slug>.md` and its sibling `_epic.md`
 
 The full workflow guide with examples is in `docs/ai-workflow/README.md`. Workflow skills are exposed in `.claude/skills/` from the canonical `.agents/skills/` source. Use the skill matching the current phase; do not edit the symlinked Claude copy independently.
 

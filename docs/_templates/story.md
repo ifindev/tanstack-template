@@ -4,7 +4,7 @@
 > `feature-epic` skill. See [`docs/_examples/features/0001-cars/02-create.md`](../_examples/features/0001-cars/02-create.md)
 > for a filled-in reference.
 
-- Epic: [<epic-id>](./epic.md)
+- Epic: [<epic-id>](./_epic.md)
 - Brief: [project-brief](../../project-brief.md)
 
 ## Page

@@ -1,7 +1,7 @@
 # <id> — <Feature Name> (Epic)
 
 > Mid-altitude doc indexing a feature's stories. Created and updated by the
-> `feature-epic` skill. See [`docs/_examples/features/0001-cars/epic.md`](../_examples/features/0001-cars/epic.md)
+> `feature-epic` skill. See [`docs/_examples/features/0001-cars/_epic.md`](../_examples/features/0001-cars/_epic.md)
 > for a filled-in reference.
 
 ## Goal

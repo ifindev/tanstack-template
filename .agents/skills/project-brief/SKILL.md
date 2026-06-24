@@ -55,7 +55,7 @@ The skill reads:
 
 1. Read existing `docs/project-brief.md`.
 2. Take the user's change description. Identify which sections it affects:
-   - **Features table**: new feature → new row with `[<feature-name>](./features/<id>-<slug>/epic.md)` link
+   - **Features table**: new feature → new row with `[<feature-name>](./features/<id>-<slug>/_epic.md)` link
    - **RBAC Matrix**: new resource → new row; new role access → modify existing row
    - **Data Model**: new entity → new section with table; modified entity → update existing table
    - **Routes**: new route → new row in Routes table
@@ -79,7 +79,7 @@ The skill reads:
 - **Naming**: kebab-case for file paths and routes; PascalCase for entity and component names; camelCase for field names.
 - **Data model**: tables with `Field | Type | Constraints | Notes` columns; types use Postgres SQL (`VARCHAR(n)`, `DECIMAL(10,2)`, `TIMESTAMPTZ`, etc.) since the stack is Postgres + Prisma.
 - **Suggestions**: anything inferred rather than stated is marked `(suggested)` so the user can review.
-- **Feature links**: Features table entries link to `./features/<id>-<slug>/epic.md` — the link will resolve once `feature-epic` creates that file. A pre-creation link is fine.
+- **Feature links**: Features table entries link to `./features/<id>-<slug>/_epic.md` — the link will resolve once `feature-epic` creates that file. A pre-creation link is fine.
 - **No rewrites in update mode**: never reformat or restructure sections the user didn't ask to change.
 
 ## Chain

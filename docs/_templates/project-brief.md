@@ -30,7 +30,7 @@
 
 | # | Feature | Roles | One-liner |
 |---|---|---|---|
-| 0001 | [<feature name>](./features/0001-<slug>/epic.md) | <roles> | <one-line behavior> |
+| 0001 | [<feature name>](./features/0001-<slug>/_epic.md) | <roles> | <one-line behavior> |
 
 ## RBAC Matrix
 

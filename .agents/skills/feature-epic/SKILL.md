@@ -16,7 +16,7 @@ Do not invoke without a corresponding row in the Features table of `docs/project
 
 ## Modes
 
-- `create <id>-<slug>` — Draft the full epic folder: `epic.md` plus one file per initial story. Append a new epic section to `docs/trackers.md` with all stories unchecked.
+- `create <id>-<slug>` — Draft the full epic folder: `_epic.md` plus one file per initial story. Append a new epic section to `docs/trackers.md` with all stories unchecked.
 - `add-story <id>-<slug> <story-slug>` — Read existing epic, draft one new story file, update the epic's Pages & Stories table, append one line to that epic's section in `docs/trackers.md`.
 
 ## Inputs
@@ -28,8 +28,8 @@ The user provides:
 
 The skill reads:
 - `docs/project-brief.md` (always)
-- `docs/features/<id>-<slug>/epic.md` (in `add-story` mode)
-- `docs/_templates/epic.md` and `docs/_templates/story.md` (structure)
+- `docs/features/<id>-<slug>/_epic.md` (in `add-story` mode)
+- `docs/_templates/_epic.md` and `docs/_templates/story.md` (structure)
 - `docs/_examples/features/0001-cars/` (filled-in reference)
 
 ## Process — `create` mode
@@ -37,7 +37,7 @@ The skill reads:
 1. Read `docs/project-brief.md`. Confirm a Features table row exists for `<id>-<slug>`. If not, stop and tell the user to run `project-brief update` first.
 2. Take the user's feature description. Identify the initial set of stories — typically one per page (list, create, edit, archive for a CRUD feature, plus any custom actions).
 3. Ask targeted questions only for ambiguity (which interactions are in MVP, which actions are role-gated, any special UI states).
-4. Draft `docs/features/<id>-<slug>/epic.md` from `docs/_templates/epic.md`:
+4. Draft `docs/features/<id>-<slug>/_epic.md` from `docs/_templates/_epic.md`:
    - Goal: one-paragraph statement
    - Pages & Stories: table linking each story file
    - Entities Touched: pulled from the brief's Data Model
@@ -60,7 +60,7 @@ The skill reads:
    - Open Questions
 6. Append a new section to `docs/trackers.md`:
    ```
-   ## <id> — <Feature Name> · [epic](./features/<id>-<slug>/epic.md)
+   ## <id> — <Feature Name> · [epic](./features/<id>-<slug>/_epic.md)
    - [ ] [01-<slug>](./features/<id>-<slug>/01-<slug>.md) — <one-line title>
    - [ ] [02-<slug>](./features/<id>-<slug>/02-<slug>.md) — <one-line title>
    ```
@@ -69,7 +69,7 @@ The skill reads:
 
 ## Process — `add-story` mode
 
-1. Read `docs/project-brief.md` and `docs/features/<id>-<slug>/epic.md`.
+1. Read `docs/project-brief.md` and `docs/features/<id>-<slug>/_epic.md`.
 2. Determine the next story number by scanning existing files in the epic folder.
 3. Take the user's story description. Determine if it impacts the brief:
    - Introduces a new entity (e.g. an audit `ImportJob` row)
@@ -82,7 +82,7 @@ The skill reads:
    - `n`: proceed without brief change; user accepts brief will be out of date.
 5. Ask targeted questions for ambiguity in the story (file size limits, error handling, rollback behavior, etc.).
 6. Draft `docs/features/<id>-<slug>/<NN>-<story-slug>.md` from `docs/_templates/story.md`.
-7. Update the Pages & Stories table in `epic.md` to include the new story row.
+7. Update the Pages & Stories table in `_epic.md` to include the new story row.
 8. Append a single line to that epic's section in `docs/trackers.md`:
    ```
    - [ ] [<NN>-<slug>](./features/<id>-<slug>/<NN>-<slug>.md) — <one-line title>
@@ -92,12 +92,12 @@ The skill reads:
 ## Output
 
 - `create`:
-  - `docs/features/<id>-<slug>/epic.md`
+  - `docs/features/<id>-<slug>/_epic.md`
   - `docs/features/<id>-<slug>/<NN>-<slug>.md` × N
   - Modified `docs/trackers.md`
 - `add-story`:
   - `docs/features/<id>-<slug>/<NN>-<slug>.md`
-  - Modified `docs/features/<id>-<slug>/epic.md` (Pages & Stories table)
+  - Modified `docs/features/<id>-<slug>/_epic.md` (Pages & Stories table)
   - Modified `docs/trackers.md`
 
 ## Conventions

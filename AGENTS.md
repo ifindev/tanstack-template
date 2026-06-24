@@ -10,7 +10,7 @@ Before planning or implementation, read in order:
 
 1. [`docs/project-brief.md`](docs/project-brief.md) — project-altitude truth (product, roles, features, RBAC, data model, routes, tech)
 2. [`docs/trackers.md`](docs/trackers.md) — story board state
-3. The selected story file under `docs/features/<id>-<slug>/<NN>-<slug>.md` and its `epic.md`
+3. The selected story file under `docs/features/<id>-<slug>/<NN>-<slug>.md` and its `_epic.md`
 
 Canonical skill bodies live in `.agents/skills/` (auto-discovered by Codex). Claude Code receives them via symlinks in `.claude/skills/`. Do not maintain duplicate skill bodies.
 

@@ -14,7 +14,7 @@ const requiredProjectFiles = [
   "docs/project-brief.md",
   "docs/trackers.md",
   "docs/_templates/project-brief.md",
-  "docs/_templates/epic.md",
+  "docs/_templates/_epic.md",
   "docs/_templates/story.md",
 ];
 

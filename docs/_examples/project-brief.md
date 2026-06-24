@@ -41,8 +41,8 @@
 
 | # | Feature | Roles | One-liner |
 |---|---|---|---|
-| 0001 | [Cars](./features/0001-cars/epic.md) | Admin, Manager | Fleet inventory, docs, photos |
-| 0002 | [Bookings](./features/0002-bookings/epic.md) | Admin, Manager, Customer | Create and track rentals |
+| 0001 | [Cars](./features/0001-cars/_epic.md) | Admin, Manager | Fleet inventory, docs, photos |
+| 0002 | [Bookings](./features/0002-bookings/_epic.md) | Admin, Manager, Customer | Create and track rentals |
 | 0003 | Customers | Admin, Manager | Customer records |
 | 0004 | Drivers | Admin, Manager | Driver records & assignments |
 | 0005 | Pricing | Admin | Rate cards |

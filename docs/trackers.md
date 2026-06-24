@@ -15,7 +15,7 @@
 <!--
 Epic sections will be appended below by the feature-epic skill. Example:
 
-## 0001 — Cars · [epic](./features/0001-cars/epic.md)
+## 0001 — Cars · [epic](./features/0001-cars/_epic.md)
 
 - [ ] [01-list](./features/0001-cars/01-list.md) — Cars list page
 - [ ] [02-create](./features/0001-cars/02-create.md) — Add new car

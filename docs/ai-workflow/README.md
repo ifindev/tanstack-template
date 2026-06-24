@@ -12,7 +12,7 @@ docs/
 ├── trackers.md               ← board state for all stories
 ├── features/
 │   ├── 0001-<slug>/
-│   │   ├── epic.md           ← mid altitude: this feature's index + shared context
+│   │   ├── _epic.md          ← mid altitude: this feature's index + shared context
 │   │   ├── 01-<slug>.md      ← low altitude: one page-level construction doc
 │   │   ├── 02-<slug>.md
 │   │   └── …
@@ -24,7 +24,7 @@ docs/
 
 **Layer 1 — Project Brief** (`docs/project-brief.md`): one living document at project altitude. Contains Product, Roles, Features (table with links to each epic), RBAC matrix, Data Model (DB-typed tables), Routes, Tech, Open Questions. Loaded every session. Updated when project structure changes (new feature, new entity, new role, new route) — not for every story tweak.
 
-**Layer 2 — Feature Epic + Stories** (`docs/features/<id>-<slug>/`): one folder per feature. `epic.md` is the index plus shared context (shared components, shared module files, build order). Each story file is one page-level construction doc: Page, Dependencies, User Flow, Components on Page, Validations, UI States, Copy, API, Frontend Wiring, Tasks, Open Questions.
+**Layer 2 — Feature Epic + Stories** (`docs/features/<id>-<slug>/`): one folder per feature. `_epic.md` is the index plus shared context (shared components, shared module files, build order). Each story file is one page-level construction doc: Page, Dependencies, User Flow, Components on Page, Validations, UI States, Copy, API, Frontend Wiring, Tasks, Open Questions.
 
 **Trackers MOC** (`docs/trackers.md`): board state. Grouped by epic. Checkbox states: `[ ]` pending, `[-]` in progress, `[x]` done. Summary block at the top with totals and `Now building`.
 
@@ -106,12 +106,12 @@ Filled-in references live in [`docs/_examples/`](../_examples/):
 
 - [`project-brief.md`](../_examples/project-brief.md) — Car Rental System brief
 - [`trackers.md`](../_examples/trackers.md) — board with mixed statuses
-- [`features/0001-cars/epic.md`](../_examples/features/0001-cars/epic.md)
+- [`features/0001-cars/_epic.md`](../_examples/features/0001-cars/_epic.md)
 - [`features/0001-cars/01-list.md`](../_examples/features/0001-cars/01-list.md)
 - [`features/0001-cars/02-create.md`](../_examples/features/0001-cars/02-create.md) — the detailed worked example
 - [`features/0001-cars/03-edit.md`](../_examples/features/0001-cars/03-edit.md)
 - [`features/0001-cars/04-archive.md`](../_examples/features/0001-cars/04-archive.md)
-- [`features/0002-bookings/epic.md`](../_examples/features/0002-bookings/epic.md)
+- [`features/0002-bookings/_epic.md`](../_examples/features/0002-bookings/_epic.md)
 
 Empty starters live in [`docs/_templates/`](../_templates/).
 

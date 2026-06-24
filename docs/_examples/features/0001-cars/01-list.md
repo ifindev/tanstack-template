@@ -1,6 +1,6 @@
 # 0001-cars / 01-list — Cars list
 
-- Epic: [0001-cars](./epic.md)
+- Epic: [0001-cars](./_epic.md)
 - Brief: [project-brief](../../project-brief.md)
 
 ## Page

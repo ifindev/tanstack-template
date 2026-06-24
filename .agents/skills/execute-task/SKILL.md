@@ -25,7 +25,7 @@ The skill reads, in order:
 1. `AGENTS.md` — application architecture reference (stack, module pattern, conventions)
 2. `docs/project-brief.md` — project altitude truth
 3. `docs/trackers.md` — board state, to pick a story (in `next` mode) and to flip checkboxes
-4. `docs/features/<id>-<slug>/epic.md` — feature context (shared components, build order, shared module files)
+4. `docs/features/<id>-<slug>/_epic.md` — feature context (shared components, build order, shared module files)
 5. `docs/features/<id>-<slug>/<NN>-<story-slug>.md` — the construction doc for this story
 
 ## Process
