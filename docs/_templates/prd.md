@@ -1,7 +1,7 @@
-# <Project Name> — Project Brief
+# <Project Name> — PRD
 
-> Living document at project altitude. Updated by the `project-brief` skill in
-> `create` or `update` mode. See [`docs/_examples/project-brief.md`](../_examples/project-brief.md)
+> Living document at project altitude. Updated by the `prd` skill in
+> `create` or `update` mode. See [`docs/_examples/prd.md`](../_examples/prd.md)
 > for a filled-in reference.
 
 ## Product
@@ -14,17 +14,35 @@
 - <problem 1>
 - <problem 2>
 
-**Out of scope for MVP**:
-- <explicit exclusion 1>
-- <explicit exclusion 2>
-
 **Success metrics**:
 - <how we know it worked>
+
+## Goals
+
+- <business or product outcome 1>
+- <user outcome 1>
+
+## Non-Goals
+
+- <explicitly excluded behavior, audience, market, or use case>
+- <another meaningful boundary>
 
 ## Roles
 
 - **<Role>** — <one-paragraph description: who they are, what they primarily do>
 - **<Role>** — <...>
+
+## User Journeys
+
+| User | Journey | Success Criteria |
+|---|---|---|
+| <role> | <what they need to accomplish> | <observable end state> |
+
+## MVP Scope
+
+| Feature | MVP | Later |
+|---|---|---|
+| <feature> | <included now> | <deferred> |
 
 ## Features
 
