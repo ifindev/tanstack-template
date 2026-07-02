@@ -1,7 +1,7 @@
 # 0001-cars / 02-create — Add new car
 
 - Epic: [0001-cars](./_epic.md)
-- Brief: [project-brief](../../project-brief.md)
+- PRD: [prd](../../prd.md)
 
 ## Page
 
