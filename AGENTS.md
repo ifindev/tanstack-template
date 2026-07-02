@@ -8,7 +8,7 @@ This repository uses the lightweight workflow in [`docs/ai-workflow/README.md`](
 
 Before planning or implementation, read in order:
 
-1. [`docs/project-brief.md`](docs/project-brief.md) — project-altitude truth (product, roles, features, RBAC, data model, routes, tech)
+1. [`docs/prd.md`](docs/prd.md) — project-altitude truth (product, goals, non-goals, roles, journeys, MVP scope, features, RBAC, data model, routes, tech)
 2. [`docs/trackers.md`](docs/trackers.md) — story board state
 3. The selected story file under `docs/features/<id>-<slug>/<NN>-<slug>.md` and its `_epic.md`
 
@@ -16,7 +16,7 @@ Canonical skill bodies live in `.agents/skills/` (auto-discovered by Codex). Cla
 
 | Skill | Purpose | Modes |
 |---|---|---|
-| `project-brief` | Draft / update `docs/project-brief.md` | `create`, `update` |
+| `prd` | Draft / update `docs/prd.md` | `create`, `update` |
 | `feature-epic` | Draft a feature epic + stories; sync `docs/trackers.md` | `create <id>-<slug>`, `add-story <id>-<slug> <story>` |
 | `execute-task` | Implement one story end-to-end | `next`, `<id>-<slug>/<NN>-<story>` |
 | `commit` | Atomic conventional commits (explicit invocation only) | — |
@@ -25,7 +25,7 @@ Canonical skill bodies live in `.agents/skills/` (auto-discovered by Codex). Cla
 
 Workflow rules:
 
-- Trust the spec set. The brief is project-altitude truth; the story file is the construction doc. Never let implementation silently become the spec.
+- Trust the spec set. The PRD is project-altitude truth; the story file is the construction doc. Never let implementation silently become the spec.
 - Stop for human direction on scope, authorization, persisted data, security, destructive behavior, or contract ambiguity.
 - Build one story at a time. While a story line in `docs/trackers.md` is `- [-]`, do not start another.
 - A story is complete only when every Task in its checklist has evidence (tests passing, manual flow walked) and its trackers line is `- [x]`.
