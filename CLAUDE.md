@@ -6,7 +6,7 @@ Read `AGENTS.md` first. It is the canonical instruction file for both Claude Cod
 
 Before implementation, also read:
 
-1. `docs/project-brief.md` — project-altitude truth
+1. `docs/prd.md` — project-altitude truth
 2. `docs/trackers.md` — story board state
 3. The selected story file under `docs/features/<id>-<slug>/<NN>-<slug>.md` and its sibling `_epic.md`
 
