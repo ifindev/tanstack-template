@@ -11,9 +11,9 @@ const requiredProjectFiles = [
   "AGENTS.md",
   "CLAUDE.md",
   "docs/ai-workflow/README.md",
-  "docs/project-brief.md",
+  "docs/prd.md",
   "docs/trackers.md",
-  "docs/_templates/project-brief.md",
+  "docs/_templates/prd.md",
   "docs/_templates/_epic.md",
   "docs/_templates/story.md",
 ];
