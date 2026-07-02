@@ -8,7 +8,7 @@ The template ships with a lightweight, agent-driven workflow for taking a projec
 
 | Skill | Purpose | Modes |
 |---|---|---|
-| `project-brief` | Draft / update `docs/project-brief.md` — the project's living truth | `create`, `update` |
+| `prd` | Draft / update `docs/prd.md` — the project's living truth | `create`, `update` |
 | `feature-epic` | Draft a feature epic and its stories; keep `docs/trackers.md` in sync | `create <id>-<slug>`, `add-story <id>-<slug> <story>` |
 | `execute-task` | Implement exactly one story end-to-end | `next`, `<id>-<slug>/<NN>-<story>` |
 
@@ -18,8 +18,8 @@ Read [`docs/ai-workflow/README.md`](docs/ai-workflow/README.md) for the full wor
 
 | Agent | Explicit invocation | Example |
 |---|---|---|
-| Codex | `$<skill-name>` | `$project-brief` |
-| Claude Code | `/<skill-name>` | `/project-brief` |
+| Codex | `$<skill-name>` | `$prd` |
+| Claude Code | `/<skill-name>` | `/prd` |
 
 Utility skills (`commit`, `create-pr`, `grill-me`, `grilling`) are kept alongside the workflow skills and are explicit-only.
 
@@ -44,13 +44,13 @@ pnpm harness:validate
 
 Then:
 
-1. Invoke `/project-brief` (Claude Code) or `$project-brief` (Codex). Describe the project conversationally. The skill suggests reasonable defaults, asks targeted questions for genuine ambiguity, and writes `docs/project-brief.md`.
-2. For each feature row in the brief, invoke `/feature-epic create <id>-<slug>`. The skill drafts the epic and stories, appends to `docs/trackers.md`.
+1. Invoke `/prd` (Claude Code) or `$prd` (Codex). Describe the project conversationally. The skill suggests reasonable defaults, asks targeted questions for genuine ambiguity, and writes `docs/prd.md` with goals, non-goals, journeys, MVP scope, and implementation context.
+2. For each feature row in the PRD, invoke `/feature-epic create <id>-<slug>`. The skill drafts the epic and stories, appends to `docs/trackers.md`.
 3. Invoke `/execute-task next` to build the first pending story. Repeat.
 
 ### Add a feature after MVP
 
-1. Invoke `/project-brief` and describe the new feature. The skill updates the brief, then offers to draft the epic inline.
+1. Invoke `/prd` and describe the new feature. The skill updates the PRD, then offers to draft the epic inline.
 2. Continue with `/execute-task` once stories are drafted.
 
 ### Detailed references
