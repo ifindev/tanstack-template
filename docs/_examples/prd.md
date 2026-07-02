@@ -1,7 +1,7 @@
-# Car Rental System — Project Brief
+# Car Rental System — PRD
 
-> Example brief for reference. Use this as a guide to the level of detail and tone
-> the `project-brief` skill should produce. Your real brief lives at `docs/project-brief.md`.
+> Example PRD for reference. Use this as a guide to the level of detail and tone
+> the `prd` skill should produce. Your real PRD lives at `docs/prd.md`.
 
 ## Product
 
@@ -18,17 +18,25 @@
 - Enables online self-service booking (currently phone-only)
 - Provides real-time fleet status visibility
 
-**Out of scope for MVP**:
-- Payment processing (manual entry only)
-- Multi-location / franchise support
-- Mobile native apps
-- GPS / telematics integration
-- Customer loyalty / rewards
-
 **Success metrics**:
 - 80% of bookings created in system within 1 month of launch
 - Zero insurance issues from expired documents
 - 25%+ of bookings via customer portal by month 3
+
+## Goals
+
+- Replace the paper booking ledger with a single operational source of truth.
+- Reduce missed document expiries for registration, insurance, and inspection.
+- Let customers create simple self-service bookings without calling the office.
+- Give managers a real-time view of fleet availability and utilization.
+
+## Non-Goals
+
+- Payment processing; staff record payments manually for MVP.
+- Multi-location or franchise workflows.
+- Native mobile apps for staff, drivers, or customers.
+- GPS, telematics, and real-time vehicle tracking.
+- Customer loyalty, rewards, or promotion campaigns.
 
 ## Roles
 
@@ -36,6 +44,27 @@
 - **Manager** — Day-to-day ops. Cars, bookings, customers. No deletes, no settings.
 - **Driver** — Sees only their assigned bookings and trip details.
 - **Customer** — Self-service portal: browse, book, view own history.
+
+## User Journeys
+
+| User | Journey | Success Criteria |
+|---|---|---|
+| Manager | Checks fleet availability and creates a booking for a phone customer | Booking is confirmed without overlapping an existing confirmed booking |
+| Admin | Adds a new car with required documents and photos | Car becomes available only after required readiness rules are satisfied |
+| Driver | Reviews assigned trips for the day | Driver sees only assigned booking details needed for pickup and return |
+| Customer | Browses available cars and requests a rental | Customer can submit a booking request and later view its status |
+
+## MVP Scope
+
+| Feature | MVP | Later |
+|---|---|---|
+| Cars | Inventory, status, documents, photos, archive | Bulk import, maintenance scheduling automation |
+| Bookings | Create, list, view, confirm, complete, cancel | Payment collection, deposits, automated reminders |
+| Customers | Customer records and booking history | Loyalty, segmentation, marketing preferences |
+| Drivers | Driver records and assignment visibility | Driver mobile app, route optimization |
+| Pricing | Basic rate cards and seasonal multipliers | Promo codes, dynamic pricing |
+| Customer Portal | Browse cars, self-book, view own bookings | Portal subdomain, online payment |
+| Reports | Revenue and utilization summaries | Export scheduling, custom report builder |
 
 ## Features
 
