@@ -1,11 +1,11 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useEffect, useRef, useState } from "react";
+import { trpc } from "@/lib/client/trpc";
 import {
   type ChatUiMessage,
   CONVERSATION_CREATED_DATA_PART,
-} from "@/modules/chat/ui";
-import { trpc } from "@/lib/trpc";
+} from "@/modules/chat/chat.ui";
 
 type UseChatSessionProps = {
   chatId: string;
@@ -34,24 +34,26 @@ export function useChatSession({
   const [chatError, setChatError] = useState<string | null>(null);
   const chatEnabled = features?.chatEnabled ?? false;
 
-  const { messages, sendMessage, status, setMessages } = useChat<ChatUiMessage>({
-    transport: new DefaultChatTransport({
-      api: "/api/chat",
-      body: conversationId ? { conversationId } : undefined,
-    }),
-    id: chatId,
-    messages: initialMessages,
-    onData: (dataPart) => {
-      if (dataPart.type !== CONVERSATION_CREATED_DATA_PART) return;
-      onConversationCreated?.(dataPart.data.conversationId);
+  const { messages, sendMessage, status, setMessages } = useChat<ChatUiMessage>(
+    {
+      transport: new DefaultChatTransport({
+        api: "/api/chat",
+        body: conversationId ? { conversationId } : undefined,
+      }),
+      id: chatId,
+      messages: initialMessages,
+      onData: (dataPart) => {
+        if (dataPart.type !== CONVERSATION_CREATED_DATA_PART) return;
+        onConversationCreated?.(dataPart.data.conversationId);
+      },
+      onError: () => {
+        setChatError(CHAT_PROVIDER_ERROR);
+      },
+      onFinish: () => {
+        onChatFinished?.();
+      },
     },
-    onError: () => {
-      setChatError(CHAT_PROVIDER_ERROR);
-    },
-    onFinish: () => {
-      onChatFinished?.();
-    },
-  });
+  );
 
   // useChat reads `messages` prop only at mount. For existing conversations the
   // tRPC query resolves after mount, so we hydrate the store once when the first

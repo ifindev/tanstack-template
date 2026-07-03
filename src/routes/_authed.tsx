@@ -7,7 +7,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { auth } from "@/shared/auth/better-auth";
+import { auth } from "@/lib/server/auth/better-auth";
 
 const getServerSession = createServerFn({ method: "GET" }).handler(async () => {
   const request = getRequest();

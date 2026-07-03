@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useRef } from "react";
-import { useChatSession } from "@/hooks/use-chat-session";
 import { useChatScroll } from "@/hooks/use-chat-scroll";
+import { useChatSession } from "@/hooks/use-chat-session";
 
 export function useNewConversationViewModel() {
   const navigate = useNavigate();

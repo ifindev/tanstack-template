@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { BrandLockup } from "@/components/layout/brand";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/client/auth-client";
 
 export function Navbar() {
   const navigate = useNavigate();

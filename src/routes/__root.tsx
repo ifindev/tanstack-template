@@ -7,7 +7,7 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import type { ReactNode } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Sentry } from "@/shared/sentry/client";
+import { Sentry } from "@/lib/server/sentry/client";
 import "../styles/globals.css";
 
 export const Route = createRootRoute({
