@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { auth } from "@/shared/auth/better-auth";
-import { prisma } from "@/shared/db/prisma";
+import { auth } from "@/lib/server/auth/better-auth";
+import { prisma } from "@/lib/server/db/prisma";
 import { handleChatPost } from "./chat";
 
 const aiMocks = vi.hoisted(() => ({
@@ -8,6 +8,8 @@ const aiMocks = vi.hoisted(() => ({
   convertToModelMessagesMock: vi.fn(async (messages) => messages),
   generateTextMock: vi.fn(),
   streamTextMock: vi.fn(),
+  isChatEnabledMock: vi.fn(),
+  getChatModelMock: vi.fn(() => "mock-model"),
 }));
 
 vi.mock("ai", async () => {
@@ -39,7 +41,15 @@ vi.mock("ai", async () => {
   };
 });
 
-vi.mock("@/shared/auth/better-auth", () => ({
+vi.mock("@/lib/server/ai/config", () => ({
+  isChatEnabled: aiMocks.isChatEnabledMock,
+}));
+
+vi.mock("@/lib/server/ai/openai", () => ({
+  getChatModel: aiMocks.getChatModelMock,
+}));
+
+vi.mock("@/lib/server/auth/better-auth", () => ({
   auth: {
     api: {
       getSession: vi.fn(),
@@ -47,7 +57,7 @@ vi.mock("@/shared/auth/better-auth", () => ({
   },
 }));
 
-vi.mock("@/shared/logger", () => ({
+vi.mock("@/lib/server/logger", () => ({
   logger: {
     child: () => ({
       info: vi.fn(),
@@ -57,7 +67,7 @@ vi.mock("@/shared/logger", () => ({
   },
 }));
 
-vi.mock("@/shared/sentry/server", () => ({
+vi.mock("@/lib/server/sentry/server", () => ({
   Sentry: {
     captureException: vi.fn(),
   },
@@ -68,14 +78,61 @@ const originalEnv = { ...process.env };
 afterEach(() => {
   process.env = { ...originalEnv };
   aiMocks.capturedDataParts.length = 0;
+  aiMocks.isChatEnabledMock.mockReset();
+  aiMocks.getChatModelMock.mockReset();
+  aiMocks.getChatModelMock.mockReturnValue("mock-model");
   vi.clearAllMocks();
 });
 
 describe("/api/chat", () => {
+  it("returns 401 JSON when unauthenticated", async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce(null);
+
+    const response = await handleChatPost(
+      new Request("http://localhost/api/chat", {
+        method: "POST",
+        body: JSON.stringify({
+          messages: [
+            {
+              id: "m1",
+              role: "user",
+              parts: [{ type: "text", text: "Hi" }],
+            },
+          ],
+        }),
+      }),
+    );
+
+    await expect(response.json()).resolves.toEqual({
+      code: "UNAUTHORIZED",
+      message: "Unauthorized",
+    });
+    expect(response.status).toBe(401);
+  });
+
+  it("returns 400 JSON for invalid payload", async () => {
+    aiMocks.isChatEnabledMock.mockReturnValueOnce(true);
+    vi.mocked(auth.api.getSession).mockResolvedValueOnce({
+      user: { id: "u1", email: "user@example.com" },
+      session: { id: "s1", userId: "u1" },
+    } as never);
+
+    const response = await handleChatPost(
+      new Request("http://localhost/api/chat", {
+        method: "POST",
+        body: JSON.stringify({ messages: [] }),
+      }),
+    );
+
+    await expect(response.json()).resolves.toEqual({
+      code: "INVALID_CHAT_REQUEST",
+      message: "Invalid chat request payload.",
+    });
+    expect(response.status).toBe(400);
+  });
+
   it("returns 503 and does not persist messages when chat is disabled", async () => {
-    delete process.env.AI_API_KEY;
-    delete process.env.OPENAI_API_KEY;
-    delete process.env.AI_MODEL;
+    aiMocks.isChatEnabledMock.mockReturnValueOnce(false);
     vi.mocked(auth.api.getSession).mockResolvedValueOnce({
       user: { id: "u1", email: "user@example.com" },
       session: { id: "s1", userId: "u1" },
@@ -106,8 +163,7 @@ describe("/api/chat", () => {
   });
 
   it("returns 400 and does not persist when the last user message is blank", async () => {
-    process.env.AI_API_KEY = "sk-test";
-    process.env.AI_MODEL = "gpt-4o-mini";
+    aiMocks.isChatEnabledMock.mockReturnValueOnce(true);
     vi.mocked(auth.api.getSession).mockResolvedValueOnce({
       user: { id: "u1", email: "user@example.com" },
       session: { id: "s1", userId: "u1" },
@@ -138,8 +194,7 @@ describe("/api/chat", () => {
   });
 
   it("creates a conversation on first send, persists both messages, and emits the new id", async () => {
-    process.env.AI_API_KEY = "sk-test";
-    process.env.AI_MODEL = "gpt-4o-mini";
+    aiMocks.isChatEnabledMock.mockReturnValueOnce(true);
     vi.mocked(auth.api.getSession).mockResolvedValueOnce({
       user: { id: "u1", email: "user@example.com" },
       session: { id: "s1", userId: "u1" },
@@ -166,6 +221,16 @@ describe("/api/chat", () => {
         content: "Here is the plan.",
         createdAt: new Date(),
       } as never);
+    vi.mocked(prisma.conversation.update).mockResolvedValue({
+      id: "c-new",
+      updatedAt: new Date(),
+    } as never);
+    vi.mocked(prisma.$transaction).mockImplementation((input: unknown) => {
+      if (Array.isArray(input)) {
+        return Promise.all(input as Promise<unknown>[]);
+      }
+      return Promise.resolve([]);
+    });
     vi.mocked(prisma.conversation.updateMany).mockResolvedValueOnce({
       count: 1,
     } as never);

@@ -14,7 +14,7 @@ vi.mock("@tanstack/react-router", () => ({
   useParams: () => mockUseParams(),
 }));
 
-vi.mock("@/lib/trpc", () => ({
+vi.mock("@/lib/client/trpc", () => ({
   trpc: {
     chat: {
       getConversation: {
