@@ -43,7 +43,7 @@ Components reused across multiple stories in this epic. Story-local components s
 
 ## Related
 
-- [Project Brief](../../project-brief.md)
+- [PRD](../../prd.md)
 - [Trackers](../../trackers.md)
 
 ## Open Questions

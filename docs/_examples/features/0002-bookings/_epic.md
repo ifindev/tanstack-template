@@ -49,7 +49,7 @@ Under `src/components/bookings/`:
 
 ## Related
 
-- [Project Brief](../../project-brief.md)
+- [PRD](../../prd.md)
 - [Trackers](../../trackers.md)
 
 ## Open Questions

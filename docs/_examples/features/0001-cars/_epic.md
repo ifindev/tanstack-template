@@ -48,7 +48,7 @@ Under `src/components/cars/`:
 
 ## Related
 
-- [Project Brief](../../project-brief.md)
+- [PRD](../../prd.md)
 - [Trackers](../../trackers.md)
 
 ## Open Questions

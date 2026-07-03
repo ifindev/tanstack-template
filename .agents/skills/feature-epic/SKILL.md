@@ -1,6 +1,6 @@
 ---
 name: feature-epic
-description: Draft a feature epic — the mid-altitude doc indexing a feature's pages plus one detailed story file per page — and keep docs/trackers.md in sync. Use to create the initial epic for a feature row from the project brief, or to add a new story to an existing epic (e.g. a post-MVP CRUD addition).
+description: Draft a feature epic — the mid-altitude doc indexing a feature's pages plus one detailed story file per page — and keep docs/trackers.md in sync. Use to create the initial epic for a feature row from the PRD, or to add a new story to an existing epic (e.g. a post-MVP CRUD addition).
 ---
 
 # Feature Epic
@@ -9,10 +9,10 @@ description: Draft a feature epic — the mid-altitude doc indexing a feature's 
 
 Invoke explicitly with `/feature-epic` or `$feature-epic`. Run it when:
 
-- A feature row exists in `docs/project-brief.md` and needs its epic + initial stories drafted. Use `create` mode.
+- A feature row exists in `docs/prd.md` and needs its epic + initial stories drafted. Use `create` mode.
 - An existing epic needs a new story added (e.g. a new page or action that wasn't in the original epic). Use `add-story` mode.
 
-Do not invoke without a corresponding row in the Features table of `docs/project-brief.md`. If the feature isn't in the brief, run `project-brief update` first.
+Do not invoke without a corresponding row in the Features table of `docs/prd.md`. If the feature isn't in the PRD, run `prd update` first.
 
 ## Modes
 
@@ -22,29 +22,29 @@ Do not invoke without a corresponding row in the Features table of `docs/project
 ## Inputs
 
 The user provides:
-- The feature id and slug — for example `0001-cars`. Must match a row in the brief's Features table.
+- The feature id and slug — for example `0001-cars`. Must match a row in the PRD's Features table.
 - A description of the feature and its initial stories — for `create` mode.
 - A description of the new story — for `add-story` mode.
 
 The skill reads:
-- `docs/project-brief.md` (always)
+- `docs/prd.md` (always)
 - `docs/features/<id>-<slug>/_epic.md` (in `add-story` mode)
 - `docs/_templates/_epic.md` and `docs/_templates/story.md` (structure)
 - `docs/_examples/features/0001-cars/` (filled-in reference)
 
 ## Process — `create` mode
 
-1. Read `docs/project-brief.md`. Confirm a Features table row exists for `<id>-<slug>`. If not, stop and tell the user to run `project-brief update` first.
+1. Read `docs/prd.md`. Confirm a Features table row exists for `<id>-<slug>`. If not, stop and tell the user to run `prd update` first.
 2. Take the user's feature description. Identify the initial set of stories — typically one per page (list, create, edit, archive for a CRUD feature, plus any custom actions).
 3. Ask targeted questions only for ambiguity (which interactions are in MVP, which actions are role-gated, any special UI states).
 4. Draft `docs/features/<id>-<slug>/_epic.md` from `docs/_templates/_epic.md`:
    - Goal: one-paragraph statement
    - Pages & Stories: table linking each story file
-   - Entities Touched: pulled from the brief's Data Model
+   - Entities Touched: pulled from the PRD's Data Model
    - Shared Components: components reused across multiple stories
    - Shared Module Files: schema, service, router paths under `src/modules/<slug>/`
    - Build Order: numbered list, lowest-risk first
-   - Related: links back to brief and trackers
+   - Related: links back to PRD and trackers
    - Open Questions
 5. For each story, draft `docs/features/<id>-<slug>/<NN>-<story-slug>.md` from `docs/_templates/story.md`:
    - Page (route, layout, roles, title)
@@ -69,17 +69,17 @@ The skill reads:
 
 ## Process — `add-story` mode
 
-1. Read `docs/project-brief.md` and `docs/features/<id>-<slug>/_epic.md`.
+1. Read `docs/prd.md` and `docs/features/<id>-<slug>/_epic.md`.
 2. Determine the next story number by scanning existing files in the epic folder.
-3. Take the user's story description. Determine if it impacts the brief:
+3. Take the user's story description. Determine if it impacts the PRD:
    - Introduces a new entity (e.g. an audit `ImportJob` row)
    - Adds a route that's not just a sub-path of the existing feature
    - Grants access to a role not listed for that resource
    - Changes a shared invariant
-4. If brief impact detected, prompt:
-   > "This story introduces `<change>`. Update brief first? [Y/n]"
-   - `Y`: transition into `project-brief update` logic inline; apply brief changes; then continue drafting story.
-   - `n`: proceed without brief change; user accepts brief will be out of date.
+4. If PRD impact detected, prompt:
+   > "This story introduces `<change>`. Update PRD first? [Y/n]"
+   - `Y`: transition into `prd update` logic inline; apply PRD changes; then continue drafting story.
+   - `n`: proceed without PRD change; user accepts the PRD will be out of date.
 5. Ask targeted questions for ambiguity in the story (file size limits, error handling, rollback behavior, etc.).
 6. Draft `docs/features/<id>-<slug>/<NN>-<story-slug>.md` from `docs/_templates/story.md`.
 7. Update the Pages & Stories table in `_epic.md` to include the new story row.
@@ -113,15 +113,15 @@ The skill reads:
 
 ## Chain
 
-- `add-story` → `project-brief update` (with Y/n confirmation gate when brief impact detected)
+- `add-story` → `prd update` (with Y/n confirmation gate when PRD impact detected)
 - This skill does not chain to `execute-task` — the user explicitly invokes `execute-task` when ready to build.
 
 ## Stop conditions
 
 Halt and ask when:
-- The Features table in `docs/project-brief.md` has no matching row for `<id>-<slug>`
-- The story description contradicts an entity invariant in the brief
-- The story would touch entities not listed in the brief and the gap is non-trivial
+- The Features table in `docs/prd.md` has no matching row for `<id>-<slug>`
+- The story description contradicts an entity invariant in the PRD
+- The story would touch entities not listed in the PRD and the gap is non-trivial
 - An RBAC implication is unclear (which role can take this action)
 - A shared component would conflict with one already documented under another epic
 

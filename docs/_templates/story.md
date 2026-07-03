@@ -5,7 +5,7 @@
 > for a filled-in reference.
 
 - Epic: [<epic-id>](./_epic.md)
-- Brief: [project-brief](../../project-brief.md)
+- PRD: [prd](../../prd.md)
 
 ## Page
 
