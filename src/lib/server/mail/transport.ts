@@ -1,12 +1,11 @@
 import nodemailer from "nodemailer";
+import { env } from "@/lib/server/env";
 
 export const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST ?? "localhost",
-  port: Number(process.env.SMTP_PORT ?? 1025),
+  host: env.smtpHost,
+  port: env.smtpPort,
   secure: false,
-  auth: process.env.SMTP_USER
-    ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-    : undefined,
+  auth: env.smtpUser ? { user: env.smtpUser, pass: env.smtpPass } : undefined,
 });
 
 export async function sendEmail({
@@ -19,7 +18,7 @@ export async function sendEmail({
   html: string;
 }) {
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM ?? "noreply@example.com",
+    from: env.emailFrom,
     to,
     subject,
     html,

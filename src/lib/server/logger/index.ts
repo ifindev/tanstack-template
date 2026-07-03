@@ -1,10 +1,9 @@
 import pino from "pino";
-
-const isProduction = process.env.NODE_ENV === "production";
+import { env } from "@/lib/server/env";
 
 export const logger = pino({
-  level: process.env.LOG_LEVEL ?? (isProduction ? "info" : "debug"),
-  transport: isProduction
+  level: env.logLevel,
+  transport: env.isProduction
     ? undefined
     : {
         target: "pino-pretty",

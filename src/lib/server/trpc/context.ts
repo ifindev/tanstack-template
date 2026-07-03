@@ -1,8 +1,9 @@
 import type { RateLimiterAbstract } from "rate-limiter-flexible";
-import { auth } from "@/shared/auth/better-auth";
-import { prisma } from "@/shared/db/prisma";
-import { authRateLimiter } from "@/shared/rate-limit/auth";
-import { redis } from "@/shared/redis/client";
+import { auth } from "@/lib/server/auth/better-auth";
+import { prisma } from "@/lib/server/db/prisma";
+import { authRateLimiter } from "@/lib/server/rate-limit/auth";
+import { redis } from "@/lib/server/redis/client";
+import { getClientIp } from "@/lib/server/request-ip";
 
 // NonNullable ensures we index into the resolved object, not the union with null
 type GetSessionResult = Awaited<ReturnType<typeof auth.api.getSession>>;
@@ -20,10 +21,7 @@ export interface Context {
 
 export async function createContext(request: Request): Promise<Context> {
   const sessionData = await auth.api.getSession({ headers: request.headers });
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    request.headers.get("x-real-ip") ??
-    null;
+  const ip = getClientIp(request);
   return {
     session: sessionData?.session ?? null,
     user: sessionData?.user ?? null,

@@ -1,5 +1,5 @@
 import { RateLimiterRedis } from "rate-limiter-flexible";
-import { redis } from "@/shared/redis/client";
+import { redis } from "@/lib/server/redis/client";
 
 export const chatRateLimiter = new RateLimiterRedis({
   storeClient: redis,

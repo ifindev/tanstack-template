@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { authRateLimiter } from "@/shared/rate-limit/auth";
-import { chatRateLimiter } from "@/shared/rate-limit/chat";
+import { authRateLimiter } from "@/lib/server/rate-limit/auth";
+import { chatRateLimiter } from "@/lib/server/rate-limit/chat";
 
 // setup.ts swaps both limiters for RateLimiterMemory with 100 points.
 // This verifies the swap is in effect and the limiters work without Redis.
