@@ -1,5 +1,5 @@
-import { prisma } from "@/shared/db/prisma";
-import type { MessageRole } from "./constants";
+import { prisma } from "@/lib/server/db/prisma";
+import type { MessageRole } from "./chat.constant";
 
 export async function createConversation(userId: string, title: string) {
   return prisma.conversation.create({ data: { userId, title } });
@@ -55,5 +55,13 @@ export async function addMessage(
   role: MessageRole,
   content: string,
 ) {
-  return prisma.message.create({ data: { conversationId, role, content } });
+  const now = new Date();
+  const [message] = await prisma.$transaction([
+    prisma.message.create({ data: { conversationId, role, content } }),
+    prisma.conversation.update({
+      where: { id: conversationId },
+      data: { updatedAt: now },
+    }),
+  ]);
+  return message;
 }

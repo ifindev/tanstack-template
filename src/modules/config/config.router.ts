@@ -1,5 +1,5 @@
-import { isChatEnabled } from "@/shared/ai/config";
-import { publicProcedure, router } from "@/shared/trpc/init";
+import { isChatEnabled } from "@/lib/server/ai/config";
+import { publicProcedure, router } from "@/lib/server/trpc/init";
 
 export const configRouter = router({
   features: publicProcedure.query(() => ({

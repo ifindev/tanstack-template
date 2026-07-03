@@ -1,6 +1,6 @@
-import { protectedProcedure, router } from "@/shared/trpc/init";
-import { updateProfileSchema } from "./schema";
-import { getUserById, updateUser } from "./service";
+import { protectedProcedure, router } from "@/lib/server/trpc/init";
+import { updateProfileSchema } from "./user.schema";
+import { getUserById, updateUser } from "./user.service";
 
 export const userRouter = router({
   me: protectedProcedure.query(async ({ ctx }) => {

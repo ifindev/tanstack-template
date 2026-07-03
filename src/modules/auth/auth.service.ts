@@ -1,5 +1,5 @@
-import { auth } from "@/shared/auth/better-auth";
-import { VERIFICATION_CALLBACK_URL } from "./constants";
+import { auth } from "@/lib/server/auth/better-auth";
+import { VERIFICATION_CALLBACK_URL } from "./auth.constant";
 
 export async function registerUser(data: {
   name: string;
@@ -7,12 +7,6 @@ export async function registerUser(data: {
   password: string;
 }) {
   return auth.api.signUpEmail({
-    body: data,
-  });
-}
-
-export async function loginUser(data: { email: string; password: string }) {
-  return auth.api.signInEmail({
     body: data,
   });
 }

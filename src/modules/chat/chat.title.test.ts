@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildProvisionalConversationTitle,
   normalizeConversationTitle,
-} from "./title";
+} from "./chat.title";
 
 describe("chat title helpers", () => {
   it("normalizes whitespace and trims wrapping quotes", () => {

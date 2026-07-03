@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MAX_CONVERSATION_TITLE_LENGTH } from "./constants";
+import { MAX_CONVERSATION_TITLE_LENGTH } from "./chat.constant";
 
 export const renameConversationSchema = z.object({
   id: z.string(),
@@ -20,5 +20,5 @@ export const listConversationsSchema = z.object({
 });
 
 export const bulkDeleteConversationsSchema = z.object({
-  ids: z.array(z.string()).min(1),
+  ids: z.array(z.string()).min(1).max(50),
 });

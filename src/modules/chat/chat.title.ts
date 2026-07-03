@@ -1,9 +1,9 @@
 import { generateText } from "ai";
-import { getChatModel } from "@/shared/ai/openai";
+import { getChatModel } from "@/lib/server/ai/openai";
 import {
   DEFAULT_CONVERSATION_TITLE,
   MAX_CONVERSATION_TITLE_LENGTH,
-} from "./constants";
+} from "./chat.constant";
 
 function collapseWhitespace(value: string) {
   return value.replace(/\s+/g, " ").trim();

@@ -1,4 +1,4 @@
-import { prisma } from "@/shared/db/prisma";
+import { prisma } from "@/lib/server/db/prisma";
 
 export async function getUserById(id: string) {
   return prisma.user.findUnique({ where: { id } });

@@ -1,5 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
-import { MESSAGE_ROLE } from "@/modules/chat/constants";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { prisma } from "@/lib/server/db/prisma";
+import { MESSAGE_ROLE } from "@/modules/chat/chat.constant";
 import {
   addMessage,
   createConversation,
@@ -7,10 +8,13 @@ import {
   getConversationWithMessages,
   listConversations,
   renameConversation,
-} from "@/modules/chat/service";
-import { prisma } from "@/shared/db/prisma";
+} from "@/modules/chat/chat.service";
 
 describe("chat service", () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("createConversation calls prisma.conversation.create", async () => {
     const fake = {
       id: "c1",
@@ -68,7 +72,7 @@ describe("chat service", () => {
     });
   });
 
-  it("addMessage persists a message", async () => {
+  it("addMessage persists a message and bumps conversation.updatedAt", async () => {
     const fake = {
       id: "m1",
       conversationId: "c1",
@@ -77,9 +81,26 @@ describe("chat service", () => {
       createdAt: new Date(),
     };
     vi.mocked(prisma.message.create).mockResolvedValueOnce(fake as never);
+    vi.mocked(prisma.conversation.update).mockResolvedValueOnce({
+      id: "c1",
+      updatedAt: new Date(),
+    } as never);
+    vi.mocked(prisma.$transaction).mockImplementationOnce((input: unknown) => {
+      if (Array.isArray(input)) {
+        return Promise.all(input as Promise<unknown>[]);
+      }
+      return Promise.resolve([]);
+    });
+
     const result = await addMessage("c1", MESSAGE_ROLE.USER, "Hi");
+
+    expect(prisma.$transaction).toHaveBeenCalled();
     expect(prisma.message.create).toHaveBeenCalledWith({
       data: { conversationId: "c1", role: MESSAGE_ROLE.USER, content: "Hi" },
+    });
+    expect(prisma.conversation.update).toHaveBeenCalledWith({
+      where: { id: "c1" },
+      data: { updatedAt: expect.any(Date) },
     });
     expect(result).toBe(fake);
   });

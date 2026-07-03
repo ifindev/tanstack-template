@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { INVALID_EMAIL } from "./constants";
+import { INVALID_EMAIL } from "./auth.constant";
 
 export const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),

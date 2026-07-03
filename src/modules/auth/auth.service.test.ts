@@ -1,8 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
-import { VERIFICATION_CALLBACK_URL } from "@/modules/auth/constants";
-import { registerUser, resendVerificationEmail } from "@/modules/auth/service";
+import { VERIFICATION_CALLBACK_URL } from "@/modules/auth/auth.constant";
+import {
+  registerUser,
+  resendVerificationEmail,
+} from "@/modules/auth/auth.service";
 
-vi.mock("@/shared/auth/better-auth", () => ({
+vi.mock("@/lib/server/auth/better-auth", () => ({
   auth: {
     api: {
       signUpEmail: vi.fn(),
@@ -12,7 +15,7 @@ vi.mock("@/shared/auth/better-auth", () => ({
   },
 }));
 
-import { auth } from "@/shared/auth/better-auth";
+import { auth } from "@/lib/server/auth/better-auth";
 
 describe("auth service", () => {
   it("registerUser calls auth.api.signUpEmail with correct body", async () => {
