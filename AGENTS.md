@@ -55,17 +55,21 @@ Workflow rules:
 src/
 ├── client.tsx   # Browser entry point
 ├── router.tsx   # TanStack Router instance
-├── shared/      # Infrastructure singletons — import from here, never instantiate elsewhere
-│   ├── logger/  # pino singleton; use logger.child({ module }) per feature
-│   └── sentry/  # Sentry server and client init files
+├── lib/
+│   ├── utils.ts           # shadcn cn() helper
+│   ├── client/            # Browser-safe wrappers (trpc, auth-client)
+│   └── server/            # Infrastructure singletons — never import runtime code from client
+│       ├── env.ts         # Validated environment config
+│       ├── logger/        # pino singleton; use logger.child({ module }) per feature
+│       ├── sentry/        # Sentry server and client init files
+│       └── trpc/          # tRPC init, context, root router
 ├── modules/     # Feature modules — each is self-contained (schema + service + router + tests)
-├── hooks/       # Sub-hooks called by ViewModel hooks (use-chat-session, use-chat-scroll, use-mobile)
+├── hooks/       # Sub-hooks called by ViewModel hooks (use-chat-session, use-chat-scroll)
 ├── routes/      # File-based routes (TanStack Router convention)
 ├── components/  # React components
 │   ├── ui/      # shadcn/ui primitives — do not modify these directly
-│   ├── layout/  # App-wide layout components (AppSidebar, AuthShell, Brand, Editorial, Navbar)
+│   ├── layout/  # App-wide layout components (AppSidebar, AuthShell, Brand, Editorial)
 │   └── chat/    # Chat feature components (ConversationPanel, ComposerArea, MessageMarkdown)
-├── lib/         # Thin client wrappers (tRPC client, auth client)
 └── test/        # Shared Vitest setup only (global mocks)
 ```
 
@@ -75,10 +79,11 @@ Most features follow the same four-file structure:
 
 ```
 src/modules/<feature>/
-├── schema.ts   # Zod schemas for all inputs
-├── service.ts  # Pure async functions — takes primitives, calls prisma.*, returns data
-├── router.ts   # tRPC router — calls service functions, handles tRPC errors
-└── *.test.ts   # Tests co-located with the file they test
+├── <feature>.schema.ts   # Zod schemas for all inputs
+├── <feature>.service.ts  # Pure async functions — takes primitives, calls prisma.*, returns data
+├── <feature>.router.ts   # tRPC router — calls service functions, handles tRPC errors
+├── <feature>.constant.ts # Optional constants (e.g. auth.constant.ts)
+└── <feature>.*.test.ts   # Tests co-located with the file they test
 ```
 
 **Service functions** must not reference tRPC context or HTTP. They take plain arguments (`userId: string`, etc.) and return plain data. This makes them independently testable.
@@ -87,7 +92,7 @@ src/modules/<feature>/
 
 **Router-only modules** (e.g. `config`) have no schema or service — they expose simple computed values directly in the router (e.g. feature flags from env vars).
 
-To wire a new module: add its router to `src/shared/trpc/router.ts`:
+To wire a new module: add its router to `src/lib/server/trpc/router.ts`:
 ```ts
 export const appRouter = router({
   auth: authRouter,
@@ -100,7 +105,7 @@ export const appRouter = router({
 
 ## tRPC Procedure Reference
 
-Defined in `src/shared/trpc/init.ts`:
+Defined in `src/lib/server/trpc/init.ts`:
 
 - **`publicProcedure`** — no auth check
 - **`protectedProcedure`** — throws `UNAUTHORIZED` if no session; downstream `ctx.user` and `ctx.session` are non-null
@@ -150,7 +155,7 @@ export const Route = createFileRoute("/api/my-endpoint")({
 
 ## Client Data Fetching
 
-Always use `trpc.*` from `src/lib/trpc.ts` for queries and mutations:
+Always use `trpc.*` from `src/lib/client/trpc.ts` for queries and mutations:
 
 ```ts
 // Query
@@ -189,7 +194,7 @@ if (!sessionData?.user) return new Response("Unauthorized", { status: 401 });
 
 **Client-side** (for UI state only — never trust for authorization):
 ```ts
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/client/auth-client";
 const { data: session } = authClient.useSession();
 ```
 
@@ -203,7 +208,7 @@ After any schema change:
 1. `pnpm db:migrate` to create and apply the migration
 2. `pnpm prisma generate` to regenerate the client types
 
-All DB access goes through the singleton in `src/shared/db/prisma.ts`. Never instantiate `PrismaClient` elsewhere.
+All DB access goes through the singleton in `src/lib/server/db/prisma.ts`. Never instantiate `PrismaClient` elsewhere.
 
 ## Adding UI Components
 
@@ -241,7 +246,7 @@ Use existing shadcn/ui primitives from `src/components/ui/` (Button, Input, Card
 
 ## Logging
 
-Always use `logger.child({ module: "<name>" })` from `@/shared/logger`; do not use `console.log` in application code. Server logs are structured JSON in production and pretty output in development automatically.
+Always use `logger.child({ module: "<name>" })` from `@/lib/server/logger`; do not use `console.log` in application code. Server logs are structured JSON in production and pretty output in development automatically.
 
 ## Environment Variables
 
@@ -292,8 +297,8 @@ Derive scope from the file path:
 | `src/routes/_authed/<name>` | `<name>` |
 | `src/routes/api/` | `api` |
 | `src/routes/` root files | `routes` |
-| `src/shared/<name>/` | `<name>` |
-| `src/lib/` | `lib` |
+| `src/lib/server/<name>/` | `<name>` |
+| `src/lib/client/` | `lib` |
 | `prisma/` | `db` |
 | `docs/`, `*.md` at root | `docs` |
 | `package.json`, lock files | `deps` |
@@ -303,7 +308,7 @@ Derive scope from the file path:
 
 - Default: one file per commit.
 - Group together only when in the same scope (max 3 files):
-  - `schema.ts` + `service.ts` in the same module
+  - `<feature>.schema.ts` + `<feature>.service.ts` in the same module
   - Any `*.test.ts` / `*.test.tsx` with the source file it tests
 - Never group files from different modules or scopes in one commit.
 - Auto-generated files (`routeTree.gen.ts`, `pnpm-lock.yaml`) go in their own `chore` commits, executed last.
@@ -311,7 +316,7 @@ Derive scope from the file path:
 ### Staging rules
 
 - **Never** use `git add .` or `git add -A`.
-- Stage files explicitly by name: `git add src/modules/chat/schema.ts src/modules/chat/service.ts`
+- Stage files explicitly by name: `git add src/modules/chat/chat.schema.ts src/modules/chat/chat.service.ts`
 - New (untracked), deleted, and renamed files must all be staged by explicit path.
 - **Never** use `--no-verify`.
 
