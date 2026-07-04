@@ -4,17 +4,17 @@ This codebase uses a strict module pattern for tRPC. Follow it. It exists to kee
 
 Current tRPC foundation:
 
-- `src/shared/trpc/init.ts`
-- `src/shared/trpc/context.ts`
-- `src/shared/trpc/router.ts`
-- `src/lib/trpc.ts`
+- `src/lib/server/trpc/init.ts`
+- `src/lib/server/trpc/context.ts`
+- `src/lib/server/trpc/router.ts`
+- `src/lib/client/trpc.ts`
 - `src/router.tsx`
 
 Current feature routers:
 
-- `src/modules/auth/router.ts`
-- `src/modules/user/router.ts`
-- `src/modules/chat/router.ts`
+- `src/modules/auth/auth.router.ts`
+- `src/modules/user/user.router.ts`
+- `src/modules/chat/chat.router.ts`
 
 ## The shape of a feature module
 
@@ -22,10 +22,10 @@ Each feature should live in:
 
 ```text
 src/modules/<feature>/
-  schema.ts
-  service.ts
-  router.ts
-  *.test.ts
+  <feature>.schema.ts
+  <feature>.service.ts
+  <feature>.router.ts
+  <feature>.*.test.ts
 ```
 
 Responsibilities:
@@ -42,7 +42,7 @@ The service layer must not depend on tRPC context or HTTP.
 1. Client calls `trpc.feature.endpoint.useQuery()` or `useMutation()`
 2. `src/router.tsx` sends the request to `/api/trpc` through `httpBatchLink`
 3. `src/routes/api/trpc/$.ts` passes the request into `fetchRequestHandler(...)`
-4. `src/shared/trpc/context.ts` builds the context
+4. `src/lib/server/trpc/context.ts` builds the context
 5. The selected feature router runs
 6. The router calls the feature service
 
@@ -53,7 +53,7 @@ That is the whole path.
 Example:
 
 ```ts
-// src/modules/project/schema.ts
+// src/modules/project/project.schema.ts
 import { z } from "zod";
 
 export const createProjectSchema = z.object({
@@ -68,8 +68,8 @@ Keep schemas transport-facing. They validate what crosses the tRPC boundary.
 Example:
 
 ```ts
-// src/modules/project/service.ts
-import { prisma } from "@/shared/db/prisma";
+// src/modules/project/project.service.ts
+import { prisma } from "@/lib/server/db/prisma";
 
 export async function createProject(userId: string, name: string) {
   return prisma.project.create({
@@ -84,7 +84,7 @@ That rule matters. It keeps the service reusable and testable.
 
 ## Step 3: Add the router procedure
 
-Pick the right procedure base from `src/shared/trpc/init.ts`:
+Pick the right procedure base from `src/lib/server/trpc/init.ts`:
 
 - `publicProcedure`: no auth requirement
 - `protectedProcedure`: requires `ctx.user` and `ctx.session`
@@ -93,10 +93,10 @@ Pick the right procedure base from `src/shared/trpc/init.ts`:
 Example:
 
 ```ts
-// src/modules/project/router.ts
-import { protectedProcedure, router } from "@/shared/trpc/init";
-import { createProjectSchema } from "./schema";
-import { createProject } from "./service";
+// src/modules/project/project.router.ts
+import { protectedProcedure, router } from "@/lib/server/trpc/init";
+import { createProjectSchema } from "./project.schema";
+import { createProject } from "./project.service";
 
 export const projectRouter = router({
   create: protectedProcedure
@@ -117,7 +117,7 @@ Do not move database logic from the service into the router.
 
 ## Step 4: Register the router
 
-Wire the new feature into `src/shared/trpc/router.ts`:
+Wire the new feature into `src/lib/server/trpc/router.ts`:
 
 ```ts
 import { projectRouter } from "@/modules/project/router";
@@ -134,7 +134,7 @@ If you skip this step, the endpoint does not exist.
 
 ## Step 5: Use it from the client
 
-`src/lib/trpc.ts` already exports the typed React client:
+`src/lib/client/trpc.ts` already exports the typed React client:
 
 ```ts
 export const trpc = createTRPCReact<AppRouter>();
@@ -171,7 +171,7 @@ That means:
 
 ## Context available to procedures
 
-`src/shared/trpc/context.ts` provides:
+`src/lib/server/trpc/context.ts` provides:
 
 - `session`
 - `user`

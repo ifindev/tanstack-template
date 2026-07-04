@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { Sentry } from "@/shared/sentry/server";
-import { createContext } from "@/shared/trpc/context";
-import { appRouter } from "@/shared/trpc/router";
+import { Sentry } from "@/lib/server/sentry/server";
+import { createContext } from "@/lib/server/trpc/context";
+import { appRouter } from "@/lib/server/trpc/router";
 
 const ignoredSentryCodes = new Set([
   "UNAUTHORIZED",

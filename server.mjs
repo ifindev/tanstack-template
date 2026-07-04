@@ -7,9 +7,8 @@ import app from "./dist/server/server.js";
 
 const port = Number(process.env.PORT ?? 3000);
 const clientDir = join(process.cwd(), "dist/client");
-const serverLogger = pino({
-  level: process.env.LOG_LEVEL ?? "info",
-});
+const logLevel = process.env.LOG_LEVEL ?? "info";
+const serverLogger = pino({ level: logLevel });
 
 const contentTypes = new Map([
   [".css", "text/css; charset=utf-8"],

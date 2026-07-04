@@ -2,8 +2,8 @@ import { useParams } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useChatScroll } from "@/hooks/use-chat-scroll";
 import { useChatSession } from "@/hooks/use-chat-session";
-import { trpc } from "@/lib/trpc";
-import type { ChatUiMessage } from "@/modules/chat/ui";
+import { trpc } from "@/lib/client/trpc";
+import type { ChatUiMessage } from "@/modules/chat/chat.ui";
 
 function mapMessagesToUiFormat(
   messages:

@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { httpBatchLink } from "@trpc/client";
-import { trpc } from "./lib/trpc";
+import { trpc } from "./lib/client/trpc";
 import { routeTree } from "./routeTree.gen";
 
 export function getRouter() {

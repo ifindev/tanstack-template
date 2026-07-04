@@ -2,8 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
-import { trpc } from "@/lib/trpc";
-import { registerSchema } from "@/modules/auth/schema";
+import { trpc } from "@/lib/client/trpc";
+import { registerSchema } from "@/modules/auth/auth.schema";
 
 type FormData = z.infer<typeof registerSchema>;
 

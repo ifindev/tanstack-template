@@ -26,24 +26,26 @@ Compare to a dynamic segment like `$conversationId.tsx`, which captures one URL 
 
 ## The two ways `auth` is accessed
 
-The `auth` object from `src/shared/auth/better-auth.ts` provides two distinct access patterns:
+The `auth` object from `src/lib/server/auth/better-auth.ts` provides two distinct access patterns:
 
-### 1. `auth.handler(request)` — HTTP gateway
+### 1. `handleAuthRequest(request)` — HTTP gateway
 
 Used in `src/routes/api/auth/$.ts`:
 
 ```ts
+import { handleAuthRequest } from "@/lib/server/auth/auth-handler";
+
 export const Route = createFileRoute("/api/auth/$")({
   server: {
     handlers: {
-      GET: ({ request }) => auth.handler(request),
-      POST: ({ request }) => auth.handler(request),
+      GET: ({ request }) => handleAuthRequest(request),
+      POST: ({ request }) => handleAuthRequest(request),
     },
   },
 });
 ```
 
-This delegates the entire raw `Request` to better-auth's built-in HTTP router. Better-auth inspects the URL, runs its own logic (hash passwords, write DB, send emails, set cookies), and returns a `Response`.
+`handleAuthRequest` applies IP-based rate limiting (same Redis limiter as tRPC auth procedures) to sensitive POST paths (`/sign-in/email`, `/sign-up/email`) before delegating to `auth.handler(request)`.
 
 This is the path the browser-side auth client uses:
 
@@ -75,7 +77,7 @@ This calls the same better-auth logic but without an HTTP round-trip. The call e
 
 `src/modules/auth/service.ts` is a thin wrapper around `auth.api.*`. It exists for the same reason all service files exist in this repo: to keep the tRPC router clean and to make the logic independently testable.
 
-The auth tRPC router in `src/modules/auth/router.ts` calls these service functions. All three procedures use `authRateLimitedProcedure`.
+The auth tRPC router in `src/modules/auth/auth.router.ts` calls these service functions. All three procedures use `authRateLimitedProcedure`.
 
 ## Why login bypasses tRPC
 
@@ -121,7 +123,7 @@ Ask in this order:
 
 1. **Does better-auth already have a built-in endpoint for this?** Check the better-auth docs. If yes, it is already mounted at `/api/auth/$` — you just need to call it from `authClient.*` in the browser. No new code needed.
 
-2. **Do you need a typed response in tRPC or rate limiting?** Add a procedure to `src/modules/auth/router.ts` that calls a new `auth.api.*` method via `src/modules/auth/service.ts`.
+2. **Do you need a typed response in tRPC or rate limiting?** Add a procedure to `src/modules/auth/auth.router.ts` that calls a new `auth.api.*` method via `src/modules/auth/service.ts`.
 
 3. **Do you need raw HTTP control (webhooks, custom callbacks)?** Add a new server route.
 

@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { auth } from "@/shared/auth/better-auth";
-import "@/shared/sentry/server";
+import { handleAuthRequest } from "@/lib/server/auth/auth-handler";
+import "@/lib/server/sentry/server";
 
 export const Route = createFileRoute("/api/auth/$")({
   server: {
     handlers: {
-      GET: ({ request }) => auth.handler(request),
-      POST: ({ request }) => auth.handler(request),
+      GET: ({ request }) => handleAuthRequest(request),
+      POST: ({ request }) => handleAuthRequest(request),
     },
   },
 });

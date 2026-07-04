@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "@/lib/client/trpc";
 
 type ConversationListItem = {
   id: string;
@@ -8,9 +8,7 @@ type ConversationListItem = {
   updatedAt: string | Date;
 };
 
-type DeleteTarget =
-  | { type: "single"; id: string }
-  | { type: "bulk" };
+type DeleteTarget = { type: "single"; id: string } | { type: "bulk" };
 
 export function useChatListViewModel() {
   const navigate = useNavigate();
@@ -97,7 +95,9 @@ export function useChatListViewModel() {
   };
 
   const handleSelectAll = () => {
-    setSelectedIds(new Set(filteredItems.map((item) => item.id)));
+    setSelectedIds(
+      new Set(filteredItems.map((item: ConversationListItem) => item.id)),
+    );
   };
 
   const handleDeselectAll = () => {
@@ -115,7 +115,10 @@ export function useChatListViewModel() {
 
   const handleConfirmEdit = () => {
     if (!editingConversation || !editTitle.trim()) return;
-    renameMutation.mutate({ id: editingConversation.id, title: editTitle.trim() });
+    renameMutation.mutate({
+      id: editingConversation.id,
+      title: editTitle.trim(),
+    });
   };
 
   const handleRequestDelete = (id: string) => {

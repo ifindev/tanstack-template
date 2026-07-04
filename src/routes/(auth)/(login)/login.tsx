@@ -78,7 +78,9 @@ function LoginPage() {
                   type="button"
                   onClick={vm.toggleShowPassword}
                   className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
-                  aria-label={vm.showPassword ? "Hide password" : "Show password"}
+                  aria-label={
+                    vm.showPassword ? "Hide password" : "Show password"
+                  }
                 >
                   {vm.showPassword ? (
                     <EyeOff className="size-4" />

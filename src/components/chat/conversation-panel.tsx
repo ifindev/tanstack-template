@@ -4,7 +4,7 @@ import type { ReactNode, RefObject } from "react";
 import MessageMarkdown from "@/components/chat/message-markdown";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { ChatUiMessage } from "@/modules/chat/ui";
+import type { ChatUiMessage } from "@/modules/chat/chat.ui";
 
 export type ConversationUiMessage = ChatUiMessage;
 

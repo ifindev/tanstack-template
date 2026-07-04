@@ -6,27 +6,28 @@ import {
   createUIMessageStreamResponse,
   streamText,
 } from "ai";
-import { MESSAGE_ROLE } from "@/modules/chat/constants";
+import { isChatEnabled } from "@/lib/server/ai/config";
+import { getChatModel } from "@/lib/server/ai/openai";
+import { auth } from "@/lib/server/auth/better-auth";
+import { logger } from "@/lib/server/logger";
+import { chatRateLimiter } from "@/lib/server/rate-limit/chat";
+import { Sentry } from "@/lib/server/sentry/server";
+import { chatApiRequestSchema } from "@/modules/chat/chat.api.schema";
+import { MESSAGE_ROLE } from "@/modules/chat/chat.constant";
 import {
   addMessage,
   createConversation,
   getConversation,
   renameConversation,
-} from "@/modules/chat/service";
+} from "@/modules/chat/chat.service";
 import {
   buildProvisionalConversationTitle,
   generateConversationTitle,
-} from "@/modules/chat/title";
+} from "@/modules/chat/chat.title";
 import {
   type ChatUiMessage,
   CONVERSATION_CREATED_DATA_PART,
-} from "@/modules/chat/ui";
-import { isChatEnabled } from "@/shared/ai/config";
-import { getChatModel } from "@/shared/ai/openai";
-import { auth } from "@/shared/auth/better-auth";
-import { logger } from "@/shared/logger";
-import { chatRateLimiter } from "@/shared/rate-limit/chat";
-import { Sentry } from "@/shared/sentry/server";
+} from "@/modules/chat/chat.ui";
 
 const chatLogger = logger.child({ module: "chat-api" });
 
@@ -58,7 +59,7 @@ export async function handleChatPost(request: Request) {
       headers: request.headers,
     });
     if (!sessionData?.user) {
-      return new Response("Unauthorized", { status: 401 });
+      return jsonError("Unauthorized", 401, "UNAUTHORIZED");
     }
     const user = sessionData.user;
 
@@ -73,20 +74,24 @@ export async function handleChatPost(request: Request) {
     try {
       await chatRateLimiter.consume(user.id);
     } catch {
-      return new Response("Too many requests", { status: 429 });
+      return jsonError("Too many requests", 429, "TOO_MANY_REQUESTS");
     }
 
-    const body = (await request.json()) as {
-      id?: string;
-      messages: UIMessage[];
-      conversationId?: string;
-    };
+    const rawBody = await request.json();
+    const parsedBody = chatApiRequestSchema.safeParse(rawBody);
+    if (!parsedBody.success) {
+      return jsonError(
+        "Invalid chat request payload.",
+        400,
+        "INVALID_CHAT_REQUEST",
+      );
+    }
 
-    const { messages, conversationId } = body;
+    const { messages, conversationId } = parsedBody.data;
     const lastUserMessage = messages.at(-1);
     const userPrompt =
       lastUserMessage?.role === MESSAGE_ROLE.USER
-        ? getMessageText(lastUserMessage).trim()
+        ? getMessageText(lastUserMessage as UIMessage).trim()
         : "";
 
     if (!userPrompt) {
@@ -104,12 +109,9 @@ export async function handleChatPost(request: Request) {
       event: "stream_start",
     });
 
-    let resolvedConversationId = conversationId;
-    if (resolvedConversationId) {
-      const conversation = await getConversation(
-        user.id,
-        resolvedConversationId,
-      );
+    let resolvedConversationId: string;
+    if (conversationId) {
+      const conversation = await getConversation(user.id, conversationId);
       if (!conversation) {
         return jsonError(
           "Conversation not found.",
@@ -117,6 +119,7 @@ export async function handleChatPost(request: Request) {
           "CONVERSATION_NOT_FOUND",
         );
       }
+      resolvedConversationId = conversationId;
     } else {
       const provisionalTitle = buildProvisionalConversationTitle(userPrompt);
       const conversation = await createConversation(user.id, provisionalTitle);
@@ -125,7 +128,7 @@ export async function handleChatPost(request: Request) {
 
     await addMessage(resolvedConversationId, MESSAGE_ROLE.USER, userPrompt);
 
-    const coreMessages = await convertToModelMessages(messages);
+    const coreMessages = await convertToModelMessages(messages as UIMessage[]);
 
     const result = streamText({
       model: getChatModel(),

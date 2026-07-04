@@ -3,9 +3,9 @@ import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
-import { authClient } from "@/lib/auth-client";
-import { trpc } from "@/lib/trpc";
-import { loginSchema } from "@/modules/auth/schema";
+import { authClient } from "@/lib/client/auth-client";
+import { trpc } from "@/lib/client/trpc";
+import { loginSchema } from "@/modules/auth/auth.schema";
 
 type FormData = z.infer<typeof loginSchema>;
 

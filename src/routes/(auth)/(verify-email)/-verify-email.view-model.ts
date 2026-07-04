@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/client/auth-client";
 
 type VerifyStatus = "verifying" | "success" | "error";
 
@@ -34,8 +34,10 @@ export function useVerifyEmailViewModel(token: string | undefined) {
   }, [status]);
 
   const description = useMemo(() => {
-    if (status === "verifying") return "This handoff should only take a moment.";
-    if (status === "success") return "The workspace is ready. Redirecting you to sign in.";
+    if (status === "verifying")
+      return "This handoff should only take a moment.";
+    if (status === "success")
+      return "The workspace is ready. Redirecting you to sign in.";
     return "The verification link looks expired or invalid.";
   }, [status]);
 

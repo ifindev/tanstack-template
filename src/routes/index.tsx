@@ -543,7 +543,7 @@ function TerminalBlock() {
       <div className="px-6 py-5 font-mono text-sm leading-7">
         {terminalLines.map((line, i) => (
           <div
-            key={i}
+            key={line.text}
             className={line.highlight ? "text-primary" : "text-[#e8e4dd]"}
             style={{
               opacity: 0,

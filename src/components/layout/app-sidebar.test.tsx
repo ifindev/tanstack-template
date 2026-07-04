@@ -23,7 +23,7 @@ vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => mockUseNavigate,
 }));
 
-vi.mock("@/lib/auth-client", () => ({
+vi.mock("@/lib/client/auth-client", () => ({
   authClient: {
     useSession: () => mockUseSession(),
     signOut: () => mockSignOut(),

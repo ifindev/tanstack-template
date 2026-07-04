@@ -81,10 +81,7 @@ export default function ComposerArea({
                 }}
               />
               <div className="flex justify-end">
-                <Button
-                  type="submit"
-                  disabled={!canSubmit}
-                >
+                <Button type="submit" disabled={!canSubmit}>
                   <Send className="size-4" />
                   Send
                 </Button>

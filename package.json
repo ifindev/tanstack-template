@@ -7,6 +7,7 @@
     "build": "vite build",
     "start": "node server.mjs",
     "check": "biome check .",
+    "check:all": "pnpm check && pnpm tsc && pnpm test --run",
     "format": "biome format --write .",
     "test": "vitest",
     "harness:validate": "node scripts/agent-harness/validate.mjs",
